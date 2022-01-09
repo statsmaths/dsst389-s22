@@ -4,7 +4,7 @@ output:
   html_document:
     theme: cosmo
     highlight: zenburn
-    css: "note-style.css"
+    css: "../css/note-style.css"
 ---
 
 ## Getting Started
@@ -18,8 +18,8 @@ After starting a new session, run the following code chunk to load the
 libraries and data that we will be working with today.
 
 ```{r, message=FALSE, echo=FALSE}
-source("../funs/common.R")
-source("../funs/text.R")
+source("../funs/funs.R")
+source("../funs/funs_custom.R")
 ```
 
 I have set the options `message=FALSE` and `echo=FALSE` to avoid cluttering
@@ -31,6 +31,8 @@ your solutions with all the output from this code.
 docs <- read_csv("../data/spam.csv")
 anno <- read_csv("../data/spam_token.csv.gz")
 ```
+
+## Questions
 
 ```{r, question-01}
 model <- dsst_enet_build(anno, docs)
