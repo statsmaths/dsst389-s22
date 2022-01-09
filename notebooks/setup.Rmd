@@ -1,0 +1,24 @@
+---
+title: "Setup"
+author: "Taylor Arnold"
+---
+
+## Setup
+
+This notebook installs all of the packaged needed for the other notebooks.
+Click the two green play buttons to start the installation.
+
+```{r}
+install.packages(
+  pkgs = c(
+    "tidyverse", "irlba", "umap", "glmnet", "FNN", "xgboost",
+    "tokenizers", "cleanNLP", "udpipe", "topicmodels", "ggrepel", "RcppRoll"
+  ),
+  quiet = TRUE,
+  dependencies = TRUE,
+  type = "binary"
+)
+```
+
+There may be some red text that prints out, but you should not need to worry
+unless the screen says the word "Error".

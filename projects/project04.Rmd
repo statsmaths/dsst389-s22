@@ -1,0 +1,28 @@
+---
+title: "Project 04"
+output: html_document
+---
+
+```{r, include=FALSE, message=FALSE}
+library(tidyverse)
+library(ggrepel)
+library(smodels)
+library(stringi)
+library(Matrix)
+library(glmnet)
+library(cleanNLP)
+library(magrittr)
+
+source("topic.R")
+theme_set(theme_minimal())
+options(dplyr.summarise.inform = FALSE)
+```
+
+# Load and Download the Data
+
+```{r, message=FALSE}
+wiki <- read_csv(file.path("data", "wiki_project04.csv"))
+token <- read_csv(file.path("data", "wiki_project04_token.csv.gz"))
+```
+
+# Project Code

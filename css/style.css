@@ -1,0 +1,58 @@
+#page {
+  color: #333;
+  font-family: sans-serif;
+  line-height: 1.5;
+  margin: 0 auto;
+  padding: 2em;
+  max-width: 36em;
+  font-size: min(20px, 2.4vw);
+}
+
+#header {
+  text-align: center;
+}
+
+#grid {
+  padding-top: 1em;
+}
+
+h1 {
+  line-height: 1.2;
+  font-size: 1.3em;
+  margin: 0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+td {
+  border: thin solid #aaa;
+  padding: 0.3em 0.4em;
+  text-align: center;
+}
+
+th {
+  border: thin solid #aaa;
+  padding: 0.3em 0.4em;
+  text-align: center;
+}
+
+.project > td {
+  background-color: #d9e4df;
+}
+
+.sbreak > td {
+  background-color: #eee;
+}
+
+a:link, a:visited {
+  text-decoration: none;
+  color: #e58989;
+  transition: 0.4s color;
+}
+
+a:hover {
+  color: #196094;
+}

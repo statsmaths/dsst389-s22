@@ -1,0 +1,13 @@
+---
+title: "07. Exploratory Data Analysis I"
+output:
+  html_document:
+    theme: cosmo
+    highlight: zenburn
+    css: "../css/note-style.css"
+---
+
+```{r, message=FALSE, echo=FALSE}
+source("../funs/funs.R")
+options(dsst.traceit = FALSE)
+```

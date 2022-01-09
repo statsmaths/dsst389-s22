@@ -1,0 +1,17 @@
+---
+title: "01. Machine Learning I"
+output:
+  html_document:
+    theme: cosmo
+    highlight: zenburn
+    css: "../css/note-style.css"
+---
+
+```{r, message=FALSE, echo=FALSE}
+source("../funs/funs.R")
+options(dsst.traceit = FALSE)
+```
+
+Click on the links below for today's materials:
+
+- [slides](../extra/ml1.pdf)

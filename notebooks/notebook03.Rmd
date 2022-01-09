@@ -1,0 +1,81 @@
+---
+title: "Notebook 03"
+output:
+  html_document:
+    theme: cosmo
+    highlight: zenburn
+    css: "note-style.css"
+---
+
+## Getting Started
+
+Before running this notebook, select "Session > Restart R and Clear Output" in
+the menu above to start a new R session. You may also have to hit the broom in
+the upper right-hand corner of the window. This will clear any old data sets and
+give us a blank slate to start with.
+
+After starting a new session, run the following code chunk to load the
+libraries and data that we will be working with today.
+
+```{r, message=FALSE, echo=FALSE}
+source("../funs/common.R")
+source("../funs/text.R")
+```
+
+I have set the options `message=FALSE` and `echo=FALSE` to avoid cluttering
+your solutions with all the output from this code.
+
+## Reading the Data
+
+```{r, message = FALSE}
+docs <- read_csv("../data/spam.csv")
+anno <- read_csv("../data/spam_token.csv.gz")
+```
+
+```{r, question-01}
+model <- dsst_enet_build(anno, docs)
+```
+
+```{r, question-02}
+dsst_erate(model)
+```
+
+```{r, question-03}
+dsst_erate(model, segmented = TRUE)
+```
+
+```{r, question-04}
+dsst_confusion_matrix(model)
+```
+
+```{r, question-05}
+dsst_coef(model)
+```
+
+```{r, question-06}
+dsst_coef(model, nlambda = 15)
+```
+
+```{r, question-07}
+dsst_max_prob(model, n = 10, real_label = "spam") %>% dsst_print_text()
+```
+
+```{r, question-08}
+dsst_max_prob(model, n = 10, real_label = "ham") %>% dsst_print_text()
+```
+
+```{r, question-09}
+dsst_neg_examples(model, n = 10, real_label = "spam") %>% dsst_print_text()
+```
+
+```{r, question-10}
+dsst_neg_examples(model, n = 10, real_label = "spam") %>% dsst_print_text()
+```
+
+```{r, question-11}
+dsst_kwic("call", docs, n = 10)
+```
+
+```{r, question-12}
+filter(docs, doc_id == "doc00009")$text
+```
