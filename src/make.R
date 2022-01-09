@@ -2,7 +2,7 @@ library(tidyverse)
 library(xml2)
 
 # read the HTML dataset
-obj <- read_html(file.path("..", "index_src.html"))
+obj <- read_html(file.path("index_src.html"))
 
 # find the links that have a class attribute
 links <- xml_find_all(obj, ".//a")
@@ -19,4 +19,4 @@ xml_set_name(links, "span")
 xml_set_attr(links, "href", NULL)
 
 # write the file
-write_html(obj, file.path("..", "index.html"), options = "format")
+write_html(obj, file.path("index.html"), options = "format")
