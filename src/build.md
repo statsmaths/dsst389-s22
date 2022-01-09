@@ -10,7 +10,7 @@ sapply(pkgs.to.remove, remove.packages, lib = path.lib)
 
 To build the materials zip file, do the following in a terminal:
 
-```{r}
+```{sh}
 rm -rf materials
 mkdir materials
 mkdir materials/data

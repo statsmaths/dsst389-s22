@@ -18,7 +18,7 @@
   downloaded <- c()
   for (f in avail$path)
   {
-    if (!file.exists(f))
+    if (!file.exists(file.path("..", f)))
     {
       url <- file.path(base, f)
       download.file(url, file.path("..", f), quiet = TRUE)
@@ -34,7 +34,7 @@
   if (!identical(local_funs, remote_funs))
   {
     url <- file.path(base, f)
-    download.file(url, f, quiet = TRUE)
+    download.file(url, file.path("..", f), quiet = TRUE)
     downloaded <- c(downloaded, f)
   }
 
