@@ -16,9 +16,9 @@ options(dsst.traceit = FALSE)
 
 Today we are going to do some housekeeping and course setup.
 
-Today we are going to go through a few notes, which give a long-form version of
-the posted syllabus and an outline of the course. We will then walk through
-setting up the software we will be using throughout the semester.
+We will go through a few notes, which give a long-form version of the posted
+syllabus and an outline of the course. We will then walk through setting up the
+software we will be using throughout the semester.
 
 ## Website
 
@@ -28,22 +28,6 @@ All of the materials for the course can be found on the course website:
 
 Make sure to bookmark this somewhere easy to access. The page will remain
 online indefinitely for your reference following the semester.
-
-## Who am I?
-
-- Taylor Arnold
-- From New England: born in Maine, school in MA, ME, CT
-- Moved to Richmond in 2016
-- Faculty in Data Science and Linguistics
-- Research on large text and image datasets in linguistics and cultural studies
-- I apply and develop corpus-based techniques to study how messages are
-communicated through texts and visual media
-- Lots of industry experience in data science and predictive modelling:
-  - IBM (Healthcare)
-  - Travelers (Insurance)
-  - DARPA (social media)
-  - AT&T (location analytics)
-  - Telperian (pharmaceuticals)
 
 ## What is machine learning?
 
@@ -81,16 +65,31 @@ There are three different approaches to teaching machine learning:
 
 - **Mathematical Approach**: Focus on theoretical properties of various methods,
 using the language of probability and numerical analysis.
-- **Data Science Approach**: Focus on the application of ML
-techniques in order to understand complex datasets.
 - **CS/Engineering Approach**: Focus on implementation and performance of
 ML techniques and algorithms.
+- **Data Science Approach**: Focus on the application of ML
+techniques in order to understand complex datasets.
 
 This course is firmly situated in the **Data Science Approach**.
+
+## Examples of Data Science Approaches
+
+Here are some digital projects that highlight what the data science approach to
+machine learning can do:
+
+- [pixplot](https://s3-us-west-2.amazonaws.com/lab-apps/pix-plot/index.html)
+- [addi](https://statsmaths.github.io/addi_project/06_interactive_viz/build/?id=2014712029)
+- [signsat40](http://signsat40.signsjournal.org/topic-model/)
+
+## Class structure
 
 While we will cover techniques that are (mostly) applicable to a wide range of
 applications, this semester will focus primarily on applications to large
 collections of textual data.
+
+The primary goal will be learning how to use machine learning algorithms to
+tell a story about data. We will get a lot of practice doing this with a variety
+of different textual datasets.
 
 ## What will you learn from this course?
 
@@ -111,6 +110,16 @@ integrates ML methods
 
 I have, however, tried to link to additional resources throughout the notes for
 students interested in theoretical or implementation details.
+
+## R Programming
+
+This semester we will use the open-source programming language R. No prior
+experience with R is required. I have written a number of wrapper functions that
+minimise the amount of code you need to actually write.
+
+However, if you are interested, there will be plenty of opportunities to dive
+into the wrapper functions and create your own takes on the code during the
+semester.
 
 ## Things I expect from you
 
@@ -180,6 +189,22 @@ references to other freely available resources.
 - **Is there a final exam?** No.
 - **Can I switch sections?** No, due to our use of fixed groups.
 
+## Me!
+
+- Taylor Arnold
+- From New England: born in Maine, school in MA, ME, CT
+- Moved to Richmond in 2016
+- Faculty in Data Science and Linguistics
+- Research on large text and image datasets in linguistics and cultural studies
+- I apply and develop corpus-based techniques to study how messages are
+communicated through texts and visual media
+- Lots of industry experience in data science and predictive modelling:
+  - IBM (Healthcare)
+  - Travelers (Insurance)
+  - DARPA (social media)
+  - AT&T (location analytics)
+  - Telperian (pharmaceuticals)
+
 ## Course Software
 
 We need to install three different components for this
@@ -228,8 +253,8 @@ Finally, download and unzip the "materials.zip" file from the
 class website. We will use this directory throughout the semester, so
 put it somewhere you will remember it.
 
-Then, open the setup.Rmd file in RStudio, and click the green play
-buttons.
+Then, open the file setup.Rmd in the folder notebooks within RStudio. Click
+the green play buttons to install all of the packages.
 
 ## For the Semester
 
