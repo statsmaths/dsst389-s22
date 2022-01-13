@@ -576,108 +576,108 @@ pre code {
 <h2>Model Coefficients</h2>
 <p>Making a predictive model is great and a good sign that our model makes sense and that the term frequencies in our model are associated with them labels. However, our real goal is using the model to understand the data. To do this, a key tool will be to look at the model coefficients. We can do this with the <code>dsst_coef</code> function. By default, the values are given based off of the best model from the cross-validation process:</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dsst_coef</span>(model)</span></code></pre></div>
-<pre><code>## 82 x 3 sparse Matrix of class &quot;dgCMatrix&quot;
-##                    book         film         food
-## (Intercept) -0.23710135 -0.005983007  0.243084361
-## the          .           .           -0.009442920
-## of           .           .           -0.045304830
-## &#39;s           .           .           -0.030028168
-## an           .           .           -0.074406741
-## by           .           .           -0.017012223
-## book         1.29678087  .            .          
-## who          .           .           -0.097558210
-## see          .           0.206602875  .          
-## read         1.05941763  .            .          
-## story        0.06211210  .           -0.336843751
-## movie        .           1.159127857  .          
-## these        .           .            0.330488314
-## use          .           .            0.277648163
-## film         .           0.591468429  .          
-## buy          .           .            0.122092941
-## taste        .           .            1.343867317
-## watch        .           0.553063391  .          
-## write        0.31135438  .            .          
-## flavor       .           .            1.183122327
-## man          .           .           -0.013443539
-## show         .           0.180511771  .          
-## add          .           .            0.144282342
-## play         .           0.010740561  .          
-## star         .           0.076446711  .          
-## scene        .           0.196899564  .          
-## author       0.35035807  .            .          
-## series       .           .           -0.053487185
-## product      .           .            0.716630637
-## order        .           .            0.128617140
-## eat          .           .            0.480897420
-## price        .           .            0.469243623
-## novel        0.29863309  .            .          
-## learn        0.02279078  .            .          
-## reader       0.55822168  .            .          
-## dvd          .           0.889997430  .          
-## sweet        .           .            0.018413373
-## store        .           .            0.130770384
-## actor        .           0.271256471  .          
-## performance  .           0.308652429  .          
-## Amazon       .           .            0.213702687
-## classic      .           0.402025320  .          
-## free         .           .            0.121223105
-## mix          .           .            0.121992065
-## coffee       .           .            0.260610828
-## cast         .           0.044758503  .          
-## box          .           .            0.027353742
-## brand        .           .            0.544813558
-## drink        .           .            0.311248323
-## bag          .           .            0.168075539
-## fresh        .           .            0.316878879
-## acting       .           0.536887346  .          
-## tea          .           .            0.001644502
-## music        .           0.016992793  .          
-## cup          .           .            0.353970904
-## healthy      .           .            0.378844480
-## DVD          .           0.448443089  .          
-## mystery      0.07526256  .            .          
-## delicious    .           .            0.659429354
-## comedy       .           0.095615736  .          
-## snack        .           .            0.431084907
-## video        .           0.479056328  .          
-## romance      0.04240444  .            .          
-## package      .           .            0.328979909
-## chocolate    .           .            0.016349200
-## tasty        .           .            0.796788933
-## fight        .           0.009729793  .          
-## size         .           .            0.024037497
-## cook         .           .            0.073720143
-## reading      0.13638857  .            .          
-## episode      .           0.349504442  .          
-## gluten       .           .            0.030893504
-## soup         .           .            0.055309127
-## bottle       .           .            0.103139674
-## flick        .           0.185894800  .          
-## tasting      .           .            0.569251634
-## tape         .           0.186961380  .          
-## cereal       .           .            0.003794405
-## flavorful    .           .            0.377893500
-## workout      .           0.206264883  .          
-## faithful     .           0.280089564  .          
-## Klausner     1.17853114  .            .</code></pre>
-<p>Usually, this gives too many values to easily interpret. Instead, we want to choose a smaller value for lambda. This requires some experimentation through setting the <code>nlambda</code> parameter, which controls the lambda number that we use. The allowed values are from 1 (this is the largest lambda) down to 100 (the smallest lambda). Looking at the 10th value here produces a very small model that is easy to interpret:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dsst_coef</span>(model, <span class="at">nlambda =</span> <span class="dv">10</span>)</span></code></pre></div>
-<pre><code>## 3 x 3 sparse Matrix of class &quot;dgCMatrix&quot;
-##                    book        film       food
-## (Intercept) -0.08882645 0.036110762 0.05271569
-## book         0.15217251 .           .         
-## movie        .          0.006710871 .</code></pre>
+<pre><code>## 82 x 4 sparse Matrix of class &quot;dgCMatrix&quot;
+##                    book         film         food MLN
+## (Intercept) -0.23710135 -0.005983007  0.243084361   .
+## book         1.29678087  .            .             2
+## movie        .           1.159127857  .            10
+## taste        .           .            1.343867317  12
+## read         1.05941763  .            .            13
+## film         .           0.591468429  .            18
+## flavor       .           .            1.183122327  20
+## product      .           .            0.716630637  35
+## watch        .           0.553063391  .            37
+## dvd          .           0.889997430  .            41
+## eat          .           .            0.480897420  45
+## story        0.06211210  .           -0.336843751  45
+## the          .           .           -0.009442920  48
+## tasty        .           .            0.796788933  51
+## delicious    .           .            0.659429354  53
+## see          .           0.206602875  .            53
+## video        .           0.479056328  .            54
+## price        .           .            0.469243623  54
+## snack        .           .            0.431084907  54
+## cup          .           .            0.353970904  54
+## who          .           .           -0.097558210  54
+## of           .           .           -0.045304830  54
+## these        .           .            0.330488314  55
+## brand        .           .            0.544813558  57
+## episode      .           0.349504442  .            57
+## novel        0.29863309  .            .            58
+## reader       0.55822168  .            .            59
+## use          .           .            0.277648163  60
+## DVD          .           0.448443089  .            63
+## acting       .           0.536887346  .            64
+## performance  .           0.308652429  .            64
+## coffee       .           .            0.260610828  64
+## classic      .           0.402025320  .            65
+## write        0.31135438  .            .            66
+## show         .           0.180511771  .            66
+## store        .           .            0.130770384  66
+## an           .           .           -0.074406741  66
+## &#39;s           .           .           -0.030028168  67
+## author       0.35035807  .            .            69
+## drink        .           .            0.311248323  69
+## Klausner     1.17853114  .            .            70
+## fresh        .           .            0.316878879  71
+## scene        .           0.196899564  .            72
+## tasting      .           .            0.569251634  73
+## Amazon       .           .            0.213702687  73
+## healthy      .           .            0.378844480  74
+## package      .           .            0.328979909  74
+## workout      .           0.206264883  .            74
+## tape         .           0.186961380  .            74
+## add          .           .            0.144282342  76
+## actor        .           0.271256471  .            77
+## buy          .           .            0.122092941  77
+## bag          .           .            0.168075539  78
+## flavorful    .           .            0.377893500  84
+## free         .           .            0.121223105  84
+## by           .           .           -0.017012223  84
+## order        .           .            0.128617140  85
+## star         .           0.076446711  .            87
+## flick        .           0.185894800  .            88
+## mix          .           .            0.121992065  88
+## cook         .           .            0.073720143  89
+## comedy       .           0.095615736  .            90
+## play         .           0.010740561  .            90
+## bottle       .           .            0.103139674  91
+## series       .           .           -0.053487185  91
+## reading      0.13638857  .            .            92
+## box          .           .            0.027353742  92
+## cast         .           0.044758503  .            93
+## mystery      0.07526256  .            .            94
+## size         .           .            0.024037497  94
+## faithful     .           0.280089564  .            95
+## soup         .           .            0.055309127  95
+## romance      0.04240444  .            .            95
+## gluten       .           .            0.030893504  95
+## learn        0.02279078  .            .            96
+## sweet        .           .            0.018413373  96
+## music        .           0.016992793  .            96
+## chocolate    .           .            0.016349200  96
+## man          .           .           -0.013443539  97
+## fight        .           0.009729793  .            97
+## cereal       .           .            0.003794405  98
+## tea          .           .            0.001644502  98</code></pre>
+<p>Usually, this gives too many values to easily interpret. Instead, we want to choose a smaller value for lambda. This requires some experimentation through setting the <code>lambda_num</code> parameter, which controls the lambda number that we use. The allowed values are from 1 (this is the largest lambda) down to 100 (the smallest lambda). Looking at the 10th value here produces a very small model that is easy to interpret:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dsst_coef</span>(model, <span class="at">lambda_num =</span> <span class="dv">10</span>)</span></code></pre></div>
+<pre><code>## 3 x 4 sparse Matrix of class &quot;dgCMatrix&quot;
+##                    book        film       food MLN
+## (Intercept) -0.08882645 0.036110762 0.05271569   .
+## book         0.15217251 .           .            2
+## movie        .          0.006710871 .           10</code></pre>
 <p>Increasing to 20 includes more terms and a richer understanding of the classes:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dsst_coef</span>(model, <span class="at">nlambda =</span> <span class="dv">20</span>)</span></code></pre></div>
-<pre><code>## 7 x 3 sparse Matrix of class &quot;dgCMatrix&quot;
-##                   book       film        food
-## (Intercept) -0.1351490 0.04407419 0.091074811
-## book         0.2707799 .          .          
-## read         0.1161569 .          .          
-## movie        .         0.16116943 .          
-## film         .         0.02195760 .          
-## taste        .         .          0.255904477
-## flavor       .         .          0.007651777</code></pre>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dsst_coef</span>(model, <span class="at">lambda_num =</span> <span class="dv">20</span>)</span></code></pre></div>
+<pre><code>## 7 x 4 sparse Matrix of class &quot;dgCMatrix&quot;
+##                   book       film        food MLN
+## (Intercept) -0.1351490 0.04407419 0.091074811   .
+## book         0.2707799 .          .             2
+## movie        .         0.16116943 .            10
+## taste        .         .          0.255904477  12
+## read         0.1161569 .          .            13
+## film         .         0.02195760 .            18
+## flavor       .         .          0.007651777  20</code></pre>
 <p>Usually you will need to look at several different version of the model to make interesting observations about the data.</p>
 </div>
 <div id="negative-examples" class="section level2">
@@ -1028,17 +1028,27 @@ pre code {
 <div id="keywords-in-context" class="section level2">
 <h2>Keywords in Context</h2>
 <p>As a final tool for today, we can also go back and identify the use of particular terms within the documents using a method called keywords in context, or KWiC. The function works by passing it a term to search for as well as the docs table and the number of items to return. Here, for example, we can see the ways that the term “read” are used in the texts:</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dsst_kwic</span>(<span class="st">&quot;read&quot;</span>, docs, <span class="at">n =</span> <span class="dv">10</span>)</span></code></pre></div>
-<pre><code>## [doc05752] ginal YA debuts I&#39;ve| read |in quite a while. Cl
-## [doc03984]                 I&#39;ve| read |all of Marcus Borg&#39;s
-## [doc00728] tes writing and have| read |many of her books.  
-## [doc05254] t the Cat books.  We| read |them with our 6 year
-## [doc08615] riters really should| read |this book, you get a
-## [doc02890] ook was a reasonable| read |with a variety of si
-## [doc01817] ou should definatley| read |the book. The book h
-## [doc01621] ascinating I&#39;ve ever| read |about, but the two m
-## [doc06841] e most often I don&#39;t| read,| view or use them, b
-## [doc07468]  people who have not| read |the book nor ever in</code></pre>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dsst_kwic</span>(<span class="st">&quot;read&quot;</span>, anno)</span></code></pre></div>
+<pre><code>## [doc00076] riting style kept me |reading| , and the simple ide
+## [doc00793] ast paced &amp; visceral |read   | .                   
+## [doc00988]               Having |read   | that Tom Cruise was 
+## [doc01427] its really not a bad |read   | , just disappointing
+## [doc01904]               Having |read   | the first three book
+## [doc02138] er and would like to |read   | more of his works . 
+## [doc02340]        Thank you for |reading| this                
+## [doc02782]  business book I &#39;ve |read   | sinceThe Culture Cod
+## [doc02949]       I always enjoy |reading| anything of Agatha C
+## [doc03237] eries before i began |reading|
+## [doc03535] th information after |reading| the first section , 
+## [doc03742]  guess I may as well |read   | the damned thing , n
+## [doc04005]  me that I needed to |read   | Aidan Donnelley Rowl
+## [doc04551]             You must |read   | the whole set of boo
+## [doc04818]        It &#39;s easy to |read   | &amp; filled to the brim
+## [doc05262]               I have |read   | the book and recomme
+## [doc05409]            Excellent |read   | ! !                 
+## [doc05897] ter that I only kept |reading| in hopes that the he
+## [doc06473]  was easy and fun to |read   | with her and for me 
+## [doc06903] book , while easy to |read   | , just does n&#39;t alwa</code></pre>
 <p>This will be useful when we start working with datasets where it is not immediately clear why a particular term is being associated with a label type.</p>
 </div>
 

@@ -174,20 +174,20 @@ dsst_coef(model)
 
 Usually, this gives too many values to easily interpret. Instead, we want
 to choose a smaller value for lambda. This requires some experimentation
-through setting the `nlambda` parameter, which controls the lambda number
+through setting the `lambda_num` parameter, which controls the lambda number
 that we use. The allowed values are from 1 (this is the largest lambda) down
 to 100 (the smallest lambda). Looking at the 10th value here produces a
 very small model that is easy to interpret:
 
 ```{r, message = FALSE}
-dsst_coef(model, nlambda = 10)
+dsst_coef(model, lambda_num = 10)
 ```
 
 Increasing to 20 includes more terms and a richer understanding of the
 classes:
 
 ```{r, message = FALSE}
-dsst_coef(model, nlambda = 20)
+dsst_coef(model, lambda_num = 20)
 ```
 
 Usually you will need to look at several different version of the model
@@ -270,7 +270,7 @@ as well as the docs table and the number of items to return. Here, for
 example, we can see the ways that the term "read" are used in the texts:
 
 ```{r, message = FALSE}
-dsst_kwic("read", docs, n = 10)
+dsst_kwic("read", anno)
 ```
 
 This will be useful when we start working with datasets where it is not

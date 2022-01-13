@@ -434,27 +434,61 @@ dsst_print_text <- function(res, max_chars = 500L)
 #############################################################################
 # functions to evaluate the coefficents from the elastic net model
 
-dsst_coef <- function(model, nlambda = -1)
+dsst_coef <- function(model, lambda_num = "lambda.1se", include_min_lambda = TRUE)
 {
-  lambda <- ifelse(
-    nlambda > 0, model$model$lambda[nlambda], model$model[['lambda.1se']]
-  )
+  # select the value of lambda to use
+  if (!is.character(lambda_num))
+  {
+    lambda <- model$model$lambda[lambda_num]
+  } else {
+    lambda <- model$model[[lambda_num]]
+  }
+
+  # take the coefficents for the selected value of lambda and turn this into a
+  # matrix with one row for each term and one column for each class
   temp <- coef(model$model, s = lambda)
   beta <- Reduce(cbind, temp)
-  beta <- beta[apply(beta != 0, 1, any),]
-  if (is.null(nrow(beta)))
-  {
-    beta <- matrix(beta, nrow = 1)
-    rownames(beta) <- "(Intercept)"
-  }
   colnames(beta) <- names(temp)
+
+  # now, we will take all of the coefficents for all lambda to determine the
+  # ordering of the variables; a rough form of variable importance is given by
+  # the smallest value of lambda for which we have a variable in the model; ties
+  # can be broken by the absolute value of the coefficent's sign
+  beta_all <- coef(model$model$glmnet.fit)
+  nlambda <- length(model$model$lambda)
+  min_s <- matrix(0, ncol = length(beta_all), nrow = nrow(beta))
+  for (j in seq_len(ncol(min_s)))
+  {
+      min_s[,j] <- apply(beta_all[[j]], 1, function(v) {
+        u <- which(v != 0)[1] ; ifelse(is.na(u), nlambda + 1L, u)
+      })
+  }
+  min_s <- apply(min_s, 1, min)
+  min_s[1] <- 0   # make sure intercept is first
+
+  # determine the ordering of the rows of beta
+  tsize <- -1 * apply(abs(beta), 1, max)
+  coef_order <- order(min_s, tsize)
+  beta <- beta[coef_order, ]
+  non_zero_rows <- apply(beta != 0, 1, any)
+
+  # if desired, add the minimal lambda number
+  if (include_min_lambda)
+  {
+    min_s <- min_s[coef_order]
+    beta <- cbind(beta, min_s)
+    colnames(beta)[ncol(beta)] <- "MLN"
+  }
+
+  # now, remove non-zero terms
+  beta <- beta[non_zero_rows,,drop=FALSE]
 
   return(beta)
 }
 
-dsst_coef_positive <- function(model, nlambda = -1)
+dsst_coef_positive <- function(model, nlambda = "lambda.1se")
 {
-  beta <- dsst_coef(model, nlambda = nlambda)
+  beta <- dsst_coef(model, nlambda = nlambda, include_min_lambda = FALSE)
   beta_df <- tibble(
     cname = colnames(beta)[as.integer(col(beta))],
     rname = rownames(beta)[as.integer(row(beta))],
@@ -536,24 +570,69 @@ dsst_skip_gram <- function (
 # functions to perform corpus linguistic operations
 
 dsst_kwic <- function(
-  term, docs, n = 20, ignore_case = TRUE, width = 20L, seed = 1
+  terms,
+  anno,
+  n = 20L,
+  width = 20L,
+  seed = 1,
+  upos_set = NULL,
+  xpos_set = NULL,
+  use_token = FALSE
 )
 {
   if (!is.na(seed)) { set.seed(seed) }
+  if (is.null(upos_set)) { upos_set <- unique(anno$upos) }
+  if (is.null(xpos_set)) { xpos_set <- unique(anno$xpos) }
+  if (use_token) { anno$lemma <- anno$token }
 
-  pre <- ifelse(ignore_case, "(?i)", "")
-  rex <- sprintf("%s(.{0,%d})(\\W%s\\W)(.{0,%d})", pre, width, term, width)
-  these <- stringi::stri_match(docs$text, regex = rex)
+  temp <- anno %>%
+    group_by(doc_id, sid) %>%
+    mutate(kwic_flag =
+      (lemma %in% terms) & (upos %in% upos_set) & (xpos %in% xpos_set)
+    ) %>%
+    mutate(kwic_flag = kwic_flag & !duplicated(kwic_flag)) %>%
+    filter(any(kwic_flag)) %>%
+    mutate(part = cumsum(kwic_flag) - 0.5 * kwic_flag) %>%
+    group_by(doc_id, sid, part) %>%
+    summarise(text = paste(token, collapse = " ")) %>%
+    mutate(text =
+      if_else(part == 0, stringi::stri_pad_left(text, width = width), text)
+    ) %>%
+    mutate(text =
+      if_else(part == 1, stringi::stri_pad_right(text, width = width), text)
+    ) %>%
+    mutate(text =
+      if_else(part == 0, stringi::stri_sub(text, -1 * width, -1), text)
+    ) %>%
+    mutate(text =
+      if_else(part == 1, stringi::stri_sub(text, 1, width), text)
+    )
 
-  doc_ids <- docs$doc_id[!is.na(these[, 1])]
-  nmax <- max(nchar(doc_ids))
-  doc_ids <- sprintf(paste0("%", nmax, "s"), doc_ids)
+  nw <- max(stringi::stri_length(unique(temp$text[temp$part == 0.5])))
+  temp$text[temp$part == 0.5] <- stringi::stri_pad_right(
+    temp$text[temp$part == 0.5], nw
+  )
 
-  these <- these[!is.na(these[, 1]), , drop = FALSE]
-  rex <- paste0("[%s] %", width, "s|%s|%s")
-  these <- sprintf(rex, doc_ids, these[, 2], these[, 3], these[, 4])
-  if (n < length(these)) { these <- sample(these, n) }
+  temp <- temp %>%
+    group_by(doc_id, sid) %>%
+    mutate(text = if_else(part == 0.5, paste0("|", text, "|"), text)) %>%
+    mutate(text =
+      if_else(
+        min(part) > 0 & part == 0.5,
+        stringi::stri_pad_left(
+          text, width = width + stringi::stri_length(text) + 1L
+        ),
+        text)) %>%
+    summarise(text = paste(text, collapse = " ")) %>%
+    ungroup() %>%
+    slice_sample(n = n) %>%
+    arrange(doc_id)
 
+  temp$doc_id <- sprintf("[%s]", temp$doc_id)
+  nmax <- max(stringi::stri_length(unique(temp$doc_id)))
+  temp$doc_id <- stringi::stri_pad_right(temp$doc_id, nmax + 1L)
+
+  these <- paste0(temp$doc_id, temp$text)
   cat(these, sep = "\n")
   invisible(these)
 }
