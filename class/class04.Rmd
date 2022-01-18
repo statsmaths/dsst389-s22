@@ -93,7 +93,7 @@ model <- anno %>%
 You can see the impact of the ngrams in the model coefficients:
 
 ```{r, message = FALSE}
-dsst_coef(model, nlambda = 20)
+dsst_coef(model)
 ```
 
 An extension of this approach are called **skip-grams**. They work similarly
@@ -137,7 +137,7 @@ model <- anno %>%
 You can see the effect of this change here:
 
 ```{r, message = FALSE}
-dsst_coef(model, nlambda = 20)
+dsst_coef(model)
 ```
 
 Some more advice about how to use these techniques are included below, but as
@@ -157,7 +157,7 @@ model <- anno %>%
 Which results in a very different type of model:
 
 ```{r, message = FALSE}
-dsst_coef(model, nlambda = 50)
+dsst_coef(model)
 ```
 
 We will see models like this more as we turn to authorship predict tasks in the
