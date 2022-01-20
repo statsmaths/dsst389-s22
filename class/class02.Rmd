@@ -15,3 +15,5 @@ options(dsst.traceit = FALSE)
 Click on the links below for today's materials:
 
 - [slides](../extra/ml2.pdf)
+- [worksheet](../extra/ml2_hout.pdf)
+- [solutions](../extra/ml2_hout_solutions.pdf)
