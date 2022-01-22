@@ -7,54 +7,259 @@ output:
     css: "../css/note-style.css"
 ---
 
-```{r, include=FALSE}
-library(tidyverse)
-library(ggrepel)
-library(smodels)
-
-theme_set(theme_minimal())
-options(pillar.min_character_chars = 15)
-Sys.setlocale("LC_TIME", "en_US.UTF-8")
-```
-
 Project groups will be formed during the first week of the semester.
 
-### Section 01 (13h30 > 14h45)
+# Section 01 (13h30 > 14h45)
 
-**Group 1**:
+<hr style="height: 0px; border: none; border-top: 2px solid black;">
+
+**Group 1**
+
+<div class="group-row">
+  <figure class="group-figure">
+    <img src="../icons/will_eagle_green.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Will</b></figcaption>
+  </figure>
+  <figure class="group-figure">
+    <img src="../icons/brian_penguin_blue.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Brian</b></figcaption>
+  </figure>
+</div>
+
+<hr style="height: 0px; border: none; border-top: 2px solid black;">
 
 **Group 2**:
 
+<div class="group-row">
+  <figure class="group-figure">
+    <img src="../icons/ahsan_parrot_purple.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Ahsan</b></figcaption>
+  </figure>
+  <figure class="group-figure">
+    <img src="../icons/kart_falcon_peach.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Kart</b></figcaption>
+  </figure>
+</div>
+
+<hr style="height: 0px; border: none; border-top: 2px solid black;">
+
 **Group 3**:
+
+<div class="group-row">
+  <figure class="group-figure">
+    <img src="../icons/noah_cuttlefish_green.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Noah</b></figcaption>
+  </figure>
+  <figure class="group-figure">
+    <img src="../icons/jimmy_bald_eagle_green.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Jimmy</b></figcaption>
+  </figure>
+</div>
+
+<hr style="height: 0px; border: none; border-top: 2px solid black;">
 
 **Group 4**:
 
+<div class="group-row">
+  <figure class="group-figure">
+    <img src="../icons/ac_cat_periwinkle.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>AC</b></figcaption>
+  </figure>
+  <figure class="group-figure">
+    <img src="../icons/alexs_shark_blue.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Alex S.</b></figcaption>
+  </figure>
+</div>
+
+<hr style="height: 0px; border: none; border-top: 2px solid black;">
+
 **Group 5**:
+
+<div class="group-row">
+  <figure class="group-figure">
+    <img src="../icons/jenny_rabbit_pink.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Jenny</b></figcaption>
+  </figure>
+  <figure class="group-figure">
+    <img src="../icons/hannah_dog_bluegreen.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Hannah</b></figcaption>
+  </figure>
+</div>
+
+<hr style="height: 0px; border: none; border-top: 2px solid black;">
 
 **Group 6**:
 
+<div class="group-row">
+  <figure class="group-figure">
+    <img src="../icons/eli_lion_blue.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Eli</b></figcaption>
+  </figure>
+  <figure class="group-figure">
+    <img src="../icons/zohaib_falcon_yellow.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Zohaib</b></figcaption>
+  </figure>
+</div>
+
+<hr style="height: 0px; border: none; border-top: 2px solid black;">
+
 **Group 7**:
 
+<div class="group-row">
+  <figure class="group-figure">
+    <img src="../icons/mack_hippo_light_blue.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Mack</b></figcaption>
+  </figure>
+  <figure class="group-figure">
+    <img src="../icons/evan_cat_navy.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Evan</b></figcaption>
+  </figure>
+  <figure class="group-figure">
+    <img src="../icons/matthew_qmark.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Matthew</b></figcaption>
+  </figure>
+</div>
+
+<hr style="height: 0px; border: none; border-top: 2px solid black;">
+
 **Group 8**:
+
+<div class="group-row">
+  <figure class="group-figure">
+    <img src="../icons/young_qmark.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Young</b></figcaption>
+  </figure>
+</div>
+
+<hr style="height: 0px; border: none; border-top: 2px solid black;">
 
 **Group 9**:
 
-**Group 10**:
+<div class="group-row">
+  <figure class="group-figure">
+    <img src="../icons/lisa_cat_yellowgreen.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Lisa</b></figcaption>
+  </figure>
+</div>
 
-### Section 02 (15h00 > 16h15)
+<hr style="height: 0px; border: none; border-top: 2px solid black;">
 
-**Group 1**:
+# Section 02 (15h00 > 16h15)
+
+<hr style="height: 0px; border: none; border-top: 2px solid black;">
+
+**Group 1**
+
+<div class="group-row">
+  <figure class="group-figure">
+    <img src="../icons/josh_dog_blue.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Josh</b></figcaption>
+  </figure>
+  <figure class="group-figure">
+    <img src="../icons/kathryn_qmark.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Kathryn</b></figcaption>
+  </figure>
+</div>
+
+<hr style="height: 0px; border: none; border-top: 2px solid black;">
 
 **Group 2**:
 
+<div class="group-row">
+  <figure class="group-figure">
+    <img src="../icons/fernanda_giraffe_pastel.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Fernanda</b></figcaption>
+  </figure>
+  <figure class="group-figure">
+    <img src="../icons/alexc_tiger_red.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Alex C</b></figcaption>
+  </figure>
+</div>
+
+<hr style="height: 0px; border: none; border-top: 2px solid black;">
+
 **Group 3**:
+
+<div class="group-row">
+  <figure class="group-figure">
+    <img src="../icons/maggie_koala_blue.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Maggie</b></figcaption>
+  </figure>
+  <figure class="group-figure">
+    <img src="../icons/linh_dog_red.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Linh</b></figcaption>
+  </figure>
+</div>
+
+<hr style="height: 0px; border: none; border-top: 2px solid black;">
 
 **Group 4**:
 
+<div class="group-row">
+  <figure class="group-figure">
+    <img src="../icons/daniel_horse_green.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Daniel</b></figcaption>
+  </figure>
+  <figure class="group-figure">
+    <img src="../icons/andrew_dog_red.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Andrew</b></figcaption>
+  </figure>
+</div>
+
+<hr style="height: 0px; border: none; border-top: 2px solid black;">
+
 **Group 5**:
+
+<div class="group-row">
+  <figure class="group-figure">
+    <img src="../icons/ruishi_qmark.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Ruishi</b></figcaption>
+  </figure>
+  <figure class="group-figure">
+    <img src="../icons/ruiyi_wolf_red.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Ruiyi</b></figcaption>
+  </figure>
+</div>
+
+<hr style="height: 0px; border: none; border-top: 2px solid black;">
 
 **Group 6**:
 
+<div class="group-row">
+  <figure class="group-figure">
+    <img src="../icons/cheryl_cat_navy.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Cheryl</b></figcaption>
+  </figure>
+</div>
+
+<hr style="height: 0px; border: none; border-top: 2px solid black;">
+
 **Group 7**:
 
+<div class="group-row">
+  <figure class="group-figure">
+    <img src="../icons/connor_cat_teal.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Connor</b></figcaption>
+  </figure>
+  <figure class="group-figure">
+    <img src="../icons/miles_dog_purple.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Miles</b></figcaption>
+  </figure>
+</div>
+
+<hr style="height: 0px; border: none; border-top: 2px solid black;">
+
 **Group 8**:
+
+<div class="group-row">
+  <figure class="group-figure">
+    <img src="../icons/kamene_fluffydog_black.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Kamene</b></figcaption>
+  </figure>
+  <figure class="group-figure">
+    <img src="../icons/mia_cow_yellow.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Mia</b></figcaption>
+  </figure>
+</div>
+
+<hr style="height: 0px; border: none; border-top: 2px solid black;">
