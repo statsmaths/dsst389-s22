@@ -89,21 +89,21 @@ most recent plot as a JPG or PNG file.
 Groups are assigned different genres to look at in their project. You
 should be able to download your data set from within the `project01.Rmd` file.
 
-**Group 1**: `children`
+**Group 1**: `children_b`
 
-**Group 2**: `comics_graphic`
+**Group 2**: `comics_graphic_b`
 
-**Group 3**: `fantasy_paranormal`
+**Group 3**: `fantasy_paranormal_b`
 
-**Group 4/9**: `history_biography`
+**Group 4/9**: `history_biography_b`
 
-**Group 5**: `mystery_thriller_crime`
+**Group 5**: `mystery_thriller_crime_b`
 
-**Group 6**: `poetry`
+**Group 6**: `poetry_b`
 
-**Group 7**: `romance`
+**Group 7**: `romance_b`
 
-**Group 8**: `young_adult`
+**Group 8**: `young_adult_b`
 
 ## Notes
 
