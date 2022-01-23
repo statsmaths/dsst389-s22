@@ -69,6 +69,50 @@ print.ldam <- function(x, ...)
 }
 
 #############################################################################
+# function to download project data
+dsst_project_docs <- function(dname, sname)
+{
+  url_base <- sprintf("https://statsmaths.github.io/data-%s/class", dname)
+  f_corpus <- file.path("..", "data_project", sprintf("%s.csv.gz", dname))
+  u_corpus <- sprintf("%s/%s.csv.gz", url_base, sname)
+  if (!file.exists(f_corpus)) { download.file(u_corpus, f_corpus) }
+  docs <- read_csv(f_corpus)
+  docs
+}
+
+dsst_project_anno <- function(dname, sname)
+{
+  url_base <- sprintf("https://statsmaths.github.io/data-%s/class", dname)
+  f_token <- file.path("..", "data_project", sprintf("%s_token.csv.gz", dname))
+  u_token <- sprintf("%s/%s_token.csv.gz", url_base, sname)
+  if (!file.exists(f_token)) { download.file(u_token, f_token) }
+  anno <- read_csv(f_token)
+  anno
+}
+
+#############################################################################
+# copy to clipboard
+
+dsst_clipboard <- function(input) {
+  pck <- attr(class(input), "package")
+  if (!is.null(pck)) { if (pck == "Matrix") { input <- as.matrix(input) }  }
+
+  clipr::write_clip(input, allow_non_interactive = TRUE)
+}
+
+dsst_save_plot <- function(
+  filename = NA, width = 9, height = 15, units = "cm", ...
+)
+{
+  if (is.na(filename))
+  {
+    filename <- file.path(
+      "output", paste0("image-", as.integer(Sys.time()), ".png")
+    )
+  }
+}
+
+#############################################################################
 # build predictive classification models: elastic net, knn, boosted trees
 
 dsst_enet_build <- function(
