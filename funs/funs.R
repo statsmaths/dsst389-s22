@@ -13,7 +13,12 @@ suppressPackageStartupMessages(library(stringi))
 #############################################################################
 # some standard settings
 theme_set(theme_minimal())
-Sys.setlocale(locale = "en_US.UTF-8")
+if (.Platform == "unix")
+{
+  Sys.setlocale("LC_ALL", "en_US.UTF-8")
+} else {
+  Sys.setlocale("LC_ALL", "English")
+}
 Sys.setenv(LANG = "en")
 options(width = 76L)
 options(pillar.min_character_chars = 15)
@@ -530,9 +535,9 @@ dsst_coef <- function(model, lambda_num = "lambda.1se", include_min_lambda = TRU
   return(beta)
 }
 
-dsst_coef_positive <- function(model, nlambda = "lambda.1se")
+dsst_coef_positive <- function(model, lambda_num = "lambda.1se")
 {
-  beta <- dsst_coef(model, nlambda = nlambda, include_min_lambda = FALSE)
+  beta <- dsst_coef(model, lambda_num = lambda_num, include_min_lambda = FALSE)
   beta_df <- tibble(
     cname = colnames(beta)[as.integer(col(beta))],
     rname = rownames(beta)[as.integer(row(beta))],
