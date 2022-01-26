@@ -134,7 +134,9 @@ dsst_enet_build <- function(
   trace_it = getOption("dsst.traceit", TRUE),
   lambda_min_ratio = 0.05,
   nlambda = 100,
-  seed = 1
+  seed = 1,
+  embed = NULL,
+  add_terms = FALSE
 )
 {
   if (!is.na(seed)) { set.seed(seed) }
@@ -150,16 +152,32 @@ dsst_enet_build <- function(
   .assert(token_var %in% names(anno),
           sprintf("token_var '%s' not found in docs", token_var))
 
-  # create term frequency matrix
-  X <- cleanNLP::cnlp_utils_tf(
-    anno,
-    doc_set = docs[[doc_var]],
-    min_df = min_df,
-    max_df = max_df,
-    max_features = max_features,
-    doc_var = doc_var,
-    token_var = token_var
-  )
+  # create term frequency matrix, if needed
+  if (is.null(embed) | add_terms)
+  {
+    X <- cleanNLP::cnlp_utils_tf(
+      anno,
+      doc_set = docs[[doc_var]],
+      min_df = min_df,
+      max_df = max_df,
+      max_features = max_features,
+      doc_var = doc_var,
+      token_var = token_var
+    )
+  }
+
+  # add or select the embedding matrix
+  if (!is.null(embed))
+  {
+    .assert(nrow(embed) == nrow(docs),
+            "embedding must have the same number of rows as docs")
+    if (add_terms)
+    {
+      X <- cbind(X, as.matrix(embed))
+    } else {
+      X <- as.matrix(embed)
+    }
+  }
 
   # build model from the training set
   X_train <- X[docs[[train_var]] == "train", ]
