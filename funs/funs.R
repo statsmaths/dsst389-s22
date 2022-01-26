@@ -13,7 +13,7 @@ suppressPackageStartupMessages(library(stringi))
 #############################################################################
 # some standard settings
 theme_set(theme_minimal())
-if (.Platform == "unix")
+if (.Platform$OS.type == "unix")
 {
   Sys.setlocale("LC_ALL", "en_US.UTF-8")
 } else {
