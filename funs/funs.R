@@ -223,7 +223,7 @@ dsst_knn_build <- function(
   token_var = "lemma",
   train_var = "train_id",
   label_var = "label",
-  k = NA,
+  k = 1,
   seed = 1
 )
 {
@@ -256,37 +256,20 @@ dsst_knn_build <- function(
   X_train <- X[docs[[train_var]] == "train", ]
   y_train <- y[docs[[train_var]] == "train"]
 
-  this_k <- ifelse(is.na(k), 20, k)
-  model <- FNN::knn(X_train, X, y_train, k = this_k)
-  index <- attr(model, "nn.index")
-
-  mat <- matrix(y_train[index], nrow = nrow(index))
-  emat <- t(apply(mat != y, 1, cummean))
-  cv_train <- apply(emat[docs[[train_var]] == "train",], 2, mean)
-  cv_valid <- apply(emat[docs[[train_var]] == "valid",], 2, mean)
-
-  if (is.na(k)) {
-    best_k <- which.min(cv_valid)
-  } else {
-    best_k <- k
-  }
+  model <- FNN::knn(X_train, X, y_train, k = k)
+  probs <- attr(model, "nn.dist")
+  probs <- 1 - probs / max(probs)
 
   # create the predictions
-  docs$pred_label <- mat[,best_k]
-  docs$pred_value <- apply(
-    mat[,seq(1, best_k),drop = FALSE] == mat[,best_k], 1, mean
-  )
+  docs$pred_label <- as.character(model)
+  docs$pred_value <- probs
   docs$pred_index <- docs[[train_var]]
   docs$real_label <- docs[[label_var]]
 
   # create the output and return the values
   output <- structure(list(
-    index = index,
     docs = ungroup(docs),
-    k = best_k,
-    cv_curve = tibble(
-      k = seq_along(cv_train), cv_train = cv_train, cv_valid = cv_valid
-    )
+    k = 1
   ), class = c('knnm'))
 
   output

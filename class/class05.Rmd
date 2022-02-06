@@ -68,8 +68,11 @@ The most straightforward local model, which we will look at today, is called
 k-nearest neighbors, or KNN. Given a training dataset, to make predictions on a
 new point take the k closest points in the training dataset and take the most
 dominant class (in the case of ties, remove the farther points until their is
-a winner). Unlike linear regression, there is no specific *model* per say.
-The algorithm jumps right to the predictions.
+a winner). Unlike logistic regression, there is no specific *model* per say.
+The algorithm jumps right to the predictions. Let's look at a visualisation
+based on our simple data from the first few weeks of class:
+
+- [slides](../extra/knn.pdf)
 
 This seems straightforward, but do we mean by "near" in the case of text
 analysis? In this case we are still thinking of producing numeric features as
@@ -77,9 +80,23 @@ the counts of term frequencies. One produces, we could use Euclidean distance
 to describe which documents use similar terms to one another. This is
 more-or-less the approach we will use. The only tweak is that we will scale the
 features in a way that makes sure that rarer words (with low counts) are more
-important than common words (with larger counts). The opposite would occur if
-we used the raw counts themselves. We will revisit the details in a future
-set of notes.
+important than common words (with larger counts).
+
+The scaling that we will use results in a technique called TF-IDF (term
+frequency-inverse document frequency). It creates features which are a scaled
+version of the term frequencies divided by a scaled weight of how often the
+term is used in other documents. Mathematically, if
+`tf` are the number of times a term is used in a document, `df` are the
+number of documents that use the term at least once, and `N` are the total
+number of document, a TF-IDF score can be computed as:
+
+$$ \text{tfidf} = (1 + log_2(\text{tf})) \times log_2(\text{N} / \text{df}) $$
+
+The score gives a measurement of how important a term is in describing a
+document in the context of the other documents. Note that this is a popular
+choice for the scaling functions, but they are not universal and other choices
+are possible. We will use this score more when we get to unsupervised learning
+in a few weeks.
 
 To apply the k-nearest neighbors algorithm to our data, we use the function
 `dsst_knn_build`:
@@ -99,20 +116,8 @@ This is not nearly as good as the global model. We will see that when we have
 a larger set of classes the model starts to become more competitive with the
 global model.
 
-By default, the function uses a form of cross-validation to choose the best
-value of k. For text classification, it is very often the case that the best
-k is equal to 1. We can manually set a different k by setting the argument
-`k` in the function call.
-
-With a little bit of R code, we can plot the cross-validation curve.
-
-```{r}
-model$cv_curve %>%
-  ggplot(aes(x = k)) +
-    geom_line(aes(y = cv_train), linetype = "dashed") +
-    geom_line(aes(y = cv_valid)) +
-    labs(y = "Error Rate")
-```
+By default, the function uses k equal to 1. We can manually set a different k
+by setting the argument `k` in the function call.
 
 This is a nice example of a completely different model that can help show how
 well your other models are working. It has a very different approach and is
