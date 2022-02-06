@@ -79,7 +79,7 @@ dsst_project_docs <- function(dname, sname)
 {
   url_base <- sprintf("https://github.com/statsmaths/data-%s/raw/main/class", dname)
   f_corpus <- file.path("..", "data_project", sprintf("%s.csv.bz2", dname))
-  u_corpus <- sprintf("%s/%s.csv.bz2", url_base, sname)
+  u_corpus <- sprintf("%s/%s_%s.csv.bz2", url_base, sname, dname)
   if (!file.exists(f_corpus)) { download.file(u_corpus, f_corpus) }
   docs <- read_csv(f_corpus)
   docs
@@ -89,7 +89,7 @@ dsst_project_anno <- function(dname, sname)
 {
   url_base <- sprintf("https://github.com/statsmaths/data-%s/raw/main/class", dname)
   f_token <- file.path("..", "data_project", sprintf("%s_token.csv.bz2", dname))
-  u_token <- sprintf("%s/%s_token.csv.bz2", url_base, sname)
+  u_token <- sprintf("%s/%s_%s_token.csv.bz2", url_base, sname, dname)
   if (!file.exists(f_token)) { download.file(u_token, f_token) }
   anno <- read_csv(f_token)
   anno

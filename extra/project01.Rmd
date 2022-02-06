@@ -43,7 +43,7 @@ the collection as a whole [here](https://sites.google.com/eng.ucsd.edu/ucsdbookg
 There are two different prediction tasks that you may look at. The first is to
 classify the score of the book on a scale from 1-5. The second is to predict
 the gender of the author of the book being described. Here are some things you
-should consider addressing:
+might consider addressing:
 
 - How accurately can you classify the groups based on the text on the
 validation data? What kinds of errors does the model tend to make?

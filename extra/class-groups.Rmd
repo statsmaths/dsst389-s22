@@ -212,6 +212,10 @@ Project groups will be formed during the first week of the semester.
     <img src="../icons/ruiyi_wolf_red.svg" class="group-img"/>
     <figcaption class="group-caption"><b>Ruiyi</b></figcaption>
   </figure>
+  <figure class="group-figure">
+    <img src="../icons/cheryl_cat_navy.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Cheryl</b></figcaption>
+  </figure>
 </div>
 
 <hr style="height: 0px; border: none; border-top: 2px solid black;">
@@ -219,10 +223,6 @@ Project groups will be formed during the first week of the semester.
 **Group 6**:
 
 <div class="group-row">
-  <figure class="group-figure">
-    <img src="../icons/cheryl_cat_navy.svg" class="group-img"/>
-    <figcaption class="group-caption"><b>Cheryl</b></figcaption>
-  </figure>
 </div>
 
 <hr style="height: 0px; border: none; border-top: 2px solid black;">

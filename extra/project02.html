@@ -236,6 +236,100 @@ window.buildTabsets = function(tocID) {
     </style>
 
 
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  { color: #cccccc; background-color: #303030; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ffcfaf; } /* Alert */
+code span.an { color: #7f9f7f; font-weight: bold; } /* Annotation */
+code span.at { } /* Attribute */
+code span.bn { color: #dca3a3; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #f0dfaf; } /* ControlFlow */
+code span.ch { color: #dca3a3; } /* Char */
+code span.cn { color: #dca3a3; font-weight: bold; } /* Constant */
+code span.co { color: #7f9f7f; } /* Comment */
+code span.cv { color: #7f9f7f; font-weight: bold; } /* CommentVar */
+code span.do { color: #7f9f7f; } /* Documentation */
+code span.dt { color: #dfdfbf; } /* DataType */
+code span.dv { color: #dcdccc; } /* DecVal */
+code span.er { color: #c3bf9f; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #c0bed1; } /* Float */
+code span.fu { color: #efef8f; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #7f9f7f; font-weight: bold; } /* Information */
+code span.kw { color: #f0dfaf; } /* Keyword */
+code span.op { color: #f0efd0; } /* Operator */
+code span.ot { color: #efef8f; } /* Other */
+code span.pp { color: #ffcfaf; font-weight: bold; } /* Preprocessor */
+code span.sc { color: #dca3a3; } /* SpecialChar */
+code span.ss { color: #cc9393; } /* SpecialString */
+code span.st { color: #cc9393; } /* String */
+code span.va { } /* Variable */
+code span.vs { color: #cc9393; } /* VerbatimString */
+code span.wa { color: #7f9f7f; font-weight: bold; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 
 
 
@@ -248,13 +342,16 @@ text-align: justify;
 text-justify: inter-word;
 font-size: 18px;
 }
-h1 { font-size: 38px ; font-family: sans-serif !important; }
-h2 { font-size: 30px ; font-family: sans-serif !important }
-h3 { font-size: 22px ; font-family: sans-serif !important }
+h1 { font-size: 38px ; font-family: sans-serif !important ; font-weight: bold }
+h2 { font-size: 22px ; font-family: sans-serif !important ; font-weight: bold }
+h3 { font-size: 22px ; font-family: sans-serif !important ; font-weight: bold }
 li {
 text-align: justify;
 text-justify: inter-word;
 font-size: 18px;
+}
+.section {
+padding-top: 1.5em;
 }
 .section .sourceCode {
 border-radius: 15px;
@@ -279,6 +376,30 @@ transition: 0.4s;
 }
 a:hover {
 color: #196094;
+}
+.group-row {
+display: flex;
+flex-wrap: wrap;
+align-items: flex-start;
+flex-direction: row;
+height: 250px;
+width: 900px;
+}
+.group-figure {
+text-align: center;
+height: 200px;
+padding-left: 3em;
+padding-right: 3em;
+}
+.group-img {
+width: 200px;
+height: 200px;
+max-height: 200px;
+border: 0;
+vertical-align: bottom;
+}
+.group-caption {
+font-size: 1.5em;
 }
 </style>
 
@@ -395,42 +516,50 @@ pre code {
 <p><strong>Due Date</strong>: 21 February 2022 or 23 February 2022 (see below)</p>
 <div id="general-instructions" class="section level2">
 <h2>General Instructions</h2>
-<p>This page outlines the instructions for the first project. You should have a file <code>project02.Rmd</code> in your RStudio workspace where you can work on the project. I find that students prefer having a consistent format for the projects, so I will attempt to keep the format the same throughout the semester.</p>
+<p>This page outlines the instructions for the second project. You should have a file <code>project02.Rmd</code> in your RStudio workspace where you can work on the project. I find that students prefer having a consistent format for the projects, so I will attempt to keep the format the same throughout the semester.</p>
 <p>On the due-date, your group is responsible for completing two elements:</p>
 <ol style="list-style-type: decimal">
 <li>Slides presenting your results, also submitted in your Box folder.</li>
-<li>A presentation based on your slide show. This should be between 10 and 15 minutes in length.</li>
+<li>A presentation based on your slide show. This should be 10-15 minutes in length.</li>
 </ol>
-<p>As described on the syllabus, the project will be graded as either Satisfactory or Unsatisfactory. I will provide additional feedback that you can address in the next project.</p>
+<p>As described on the syllabus, the project will be graded using a rubric, which can be found <a href="../extra/project_rubric.pdf">here</a>.</p>
 </div>
 <div id="specific-instructions" class="section level2">
 <h2>Specific Instructions</h2>
-<p>This project uses a collection of product reviews from Amazon. I created it from the archive <a href="https://nijianmo.github.io/amazon/index.html">here</a>, produced by Jianmo Ni, Jiacheng Li, Julian McAuley. I have selected a collection of reviews from the most prolific reviewers. The classification task for the project is to be able to predict the author of a review. Each group has been assigned a different product category to work with (see assignments below).</p>
-<p>The goal of your project is to apply the methods we have developed so far to explore your corpus and understand what features distinguish the authors. Remember that the goal is not <em>just</em> to classify; we want to use the methods to understand the style of the authors so it can be useful to build a variety of models (some of which may be less predictive) in order to achieve this. Here are some things you should consider looking into:</p>
+<p>This project uses a collection of product reviews from Amazon. I created it from the archive <a href="https://nijianmo.github.io/amazon/index.html">here</a>, produced by Jianmo Ni, Jiacheng Li, Julian McAuley. I have selected a collection of reviews from the most prolific reviewers. The classification task for the project is to be able to predict the author of a review; there are 25 authors in each dataset. Each group has been assigned a different product category to work with (see assignments below).</p>
+<p>The goal of your project is to apply the methods we have developed so far to explore your corpus and understand what features distinguish the authors. Remember that the goal is not just to classify; we want to use the methods to understand the style of the authors so it can be useful to build a variety of models (some of which may be less predictive) in order to achieve this. Here are some things you might consider looking into:</p>
 <ul>
 <li>How well can you classify the authors based on word usage?</li>
 <li>Are any of the most predictive words surprising? You can use KWiC to figure out what is going on.</li>
-<li>How well can you classify the authors based on ungrams/bigrams/trigrams of <code>upos</code> and/or <code>xpos</code> tags? How does this compare to the word usage? Compare the predictiveness of a local model with a penalized regression.</li>
+<li>How well can you classify the authors based on unigrams/bigrams/trigrams of <code>upos</code> and/or <code>xpos</code> tags? How does this compare to the word usage? Compare the predictiveness of a local model with a penalized regression.</li>
 <li>Are some authors particularly hard to classify? Easy to classify? Can you tell why?</li>
-<li>How does adding covariates such as the number of stars increase the predictiveness of the model?</li>
 <li>Do you think that the particular products that each person reviews is the main driver of you model? How could you remove this factor (and can you)?</li>
 <li>Can you summarize the results in any interesting way?</li>
 </ul>
-<p>These are just some ideas to get you started. Feel free to go in a different direction if you find something interesting! Keep in mind that confusion matrices will be useful and that even classification rates around 30% are much better than random guessing when there are many classes.</p>
+<p>These are just some ideas to get you started. Feel free to go in a different direction if you find something interesting! Keep in mind that confusion matrices will be useful and that even classification rates around 50% are much better than random guessing when there are many classes.</p>
+<p>At the end of the day, though, your task is an open-ended one. I want you to explore the data using the techniques we have learned so far and then produce a short presentation showing your results to the rest of the class.</p>
+</div>
+<div id="presentation" class="section level2">
+<h2>Presentation</h2>
+<p>Your presentation should be in the form of a set of slides. You can build these in whatever software you would like, but please create a PDF version to submit on Box by the project deadline.</p>
+<p>The exact format of the slides is up to you, however there should be a final slide titled “Synthesis” that summarises what you have learned about the data from your analysis. It should take a big picture view of the analysis and not be overly focused on the models.</p>
+<p>You will find that most (perhaps all) of the results you want to show are tables and example reviews. Do not use screen shots for these! Screen shots are messy and not ideal. Instead, I suggest using the function <code>dsst_clipboard()</code> to copy information to the clipboard. This can then be pasted into a spreadsheet program or (in some cases) directly into a presentation. For example:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dsst_neg_examples</span>(model) <span class="sc">%&gt;%</span> <span class="fu">dsst_clipboard</span>()</span></code></pre></div>
+<p>For visualisations, you can either use the function <code>dsst_save_plot</code> to store the most recent plot as a JPG or PNG file or right/ctrl click on a plot and save the file.</p>
 </div>
 <div id="groups" class="section level2">
 <h2>Groups</h2>
 <p>Each group is working with a different product category. You should be able to download your data set from within the <code>project02.Rmd</code> file.</p>
 <p>For the first day (21 February 2022) we have, in order:</p>
-<p><strong>Group 4</strong>: <code>pet_supplies</code></p>
-<p><strong>Group 3</strong>: <code>kindle</code></p>
-<p><strong>Group 2</strong>: <code>movies_tv</code></p>
-<p><strong>Group 1</strong>: <code>grocery</code></p>
+<p><strong>Group 8</strong>: <code>pet_supplies</code></p>
+<p><strong>Group 6</strong>: <code>kindle</code></p>
+<p><strong>Group 4</strong>: <code>movies_tv</code></p>
+<p><strong>Group 2</strong>: <code>grocery</code></p>
 <p>For the second day (23 February 2022) we have, in order:</p>
-<p><strong>Group 8</strong>: <code>cds</code></p>
-<p><strong>Group 7</strong>: <code>tools</code></p>
-<p><strong>Group 6</strong>: <code>toys_games</code></p>
-<p><strong>Group 5</strong>: <code>video_games</code></p>
+<p><strong>Group 7</strong>: <code>cds</code></p>
+<p><strong>Group 5</strong>: <code>tools</code></p>
+<p><strong>Group 3</strong>: <code>toys_games</code></p>
+<p><strong>Group 1</strong>: <code>video_games</code></p>
 </div>
 <div id="notes" class="section level2">
 <h2>Notes</h2>
