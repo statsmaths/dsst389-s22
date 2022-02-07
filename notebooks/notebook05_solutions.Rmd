@@ -27,7 +27,7 @@ your solutions with all the output from this code.
 
 ## Reading the Data
 
-Today we are going to look at a dataset of short texts taken from a set of 5
+Today we are going to look at a dataset of short texts taken from a set of 3
 American authors:
 
 ```{r, message = FALSE}
