@@ -25,7 +25,10 @@ anno <- read_csv("../data/amazon_product_class_token.csv.gz")
 Today, we are going to derive a different type of local model called a gradient
 boosted trees (GBTs) or gradient boosted machine (GBMs). [Confusingly, the first
 term is far more common whereas the second abbreviation is more far more
-popularion.]
+popularion.] I have some prose notes below, but in the class we will mostly
+follow these slides:
+
+- [slides](../extra/gbm.pdf)
 
 ## Decision Trees
 
@@ -85,6 +88,8 @@ is able to make predictions
 - building a decision tree with the selected training data to predict updates
 to the probabilities from this model
 - repeat this process many times
+
+## Gradient Boosted Trees in R
 
 To run gradient boosted trees, we will use the package **xgboost**, which has
 a very fast implementation of a learning algorithm. I have wrapped up the

@@ -1,4 +1,5 @@
 library(tidyverse)
+library(xgboost)
 
 theme_set(theme_minimal())
 
@@ -115,6 +116,57 @@ make_df <- function(sigma) {
   df
 }
 
+create_fit <- function(model, to_fit, k = 1)
+{
+  mat <- as.matrix(select(to_fit, x, y))
+  pred <- matrix(predict(model, mat, iterationrange = c(1, k)), ncol = 3, byrow = TRUE)
+  to_fit$c1 <- pred[,1]
+  to_fit$c2 <- pred[,2]
+  to_fit$c3 <- pred[,3]
+
+  these <- apply(pred, 1, which.max)
+  # to_fit$c1[these == 2] <- 0
+  # to_fit$c1[these == 3] <- 0
+  # to_fit$c2[these == 1] <- 0
+  # to_fit$c2[these == 3] <- 0
+  # to_fit$c3[these == 1] <- 0
+  # to_fit$c3[these == 2] <- 0
+  to_fit
+}
+
+create_plot <- function(to_fit)
+{
+  p1 <- df %>%
+    ggplot(aes(x, y)) +
+      geom_point(aes(alpha = c1), color = "blue", data = to_fit, show.legend = FALSE) +
+      scale_fill_identity() +
+      scale_color_identity() +
+      scale_x_continuous(labels = NULL) +
+      scale_y_continuous(labels = NULL) +
+      scale_alpha_identity()
+
+  p2 <- df %>%
+    ggplot(aes(x, y)) +
+      geom_point(aes(alpha = c2), color = "yellowgreen", data = to_fit, show.legend = FALSE) +
+      scale_fill_identity() +
+      scale_color_identity() +
+      scale_x_continuous(labels = NULL) +
+      scale_y_continuous(labels = NULL) +
+      scale_alpha_identity()
+
+  p3 <- df %>%
+    ggplot(aes(x, y)) +
+      geom_point(aes(alpha = c3), color = "orange", data = to_fit, show.legend = FALSE) +
+      scale_fill_identity() +
+      scale_color_identity() +
+      scale_x_continuous(labels = NULL) +
+      scale_y_continuous(labels = NULL) +
+      scale_alpha_identity()
+
+  p <- ggpubr::ggarrange(p1, p2, p3, nrow = 1)
+  return(p)
+}
+
 df <- make_df(0.2)
 
 to_fit <- as_tibble(expand.grid(
@@ -140,64 +192,39 @@ watchlist <- list(train=data_train, valid=data_valid)
 model <- xgboost::xgb.train(data = data_train,
                    max_depth = 3,
                    eta = 0.05,
-                   nrounds = 10,
+                   nrounds = 100,
                    nthread = 2,
-                   objective = "multi:softmax",
+                   objective = "multi:softprob",
                    eval_metric = "merror",
                    watchlist = watchlist,
                    verbose = TRUE,
                    print_every_n = 25,
                    num_class = length(y_set))
 
-to_fit$color <- y_set[xgboost:::predict.xgb.Booster(model, newdata = X_valid, iterationrange = c(1, 2)) + 1]
+to_fit <- create_fit(model, to_fit, k = 2)
+p <- create_plot(to_fit)
+ggsave("../img/gbm_fig06.jpg", p, height = 6, width = 16, dpi = 400)
 
-p <- df %>%
-  ggplot(aes(x, y)) +
-    geom_point(color = "white", data = to_fit) +
-    geom_point(aes(fill = color, color = color), pch = 21, size = 2) +
-    scale_fill_identity() +
-    scale_color_identity() +
-    scale_x_continuous(labels = NULL) +
-    scale_y_continuous(labels = NULL)
+to_fit <- create_fit(model, to_fit, k = 3)
+p <- create_plot(to_fit)
+ggsave("../img/gbm_fig07.jpg", p, height = 6, width = 16, dpi = 400)
 
-ggsave("../img/gbm_fig09.jpg", p, height = 6, width = 6, dpi = 400)
+to_fit <- create_fit(model, to_fit, k = 5)
+p <- create_plot(to_fit)
+ggsave("../img/gbm_fig08.jpg", p, height = 6, width = 16, dpi = 400)
 
-p <- df %>%
-  ggplot(aes(x, y)) +
-    geom_point(aes(fill = color, color = color), pch = 21, size = 0.5, data = to_fit) +
-    geom_point(aes(fill = color, color = color), pch = 21, size = 2) +
-    scale_fill_identity() +
-    scale_color_identity() +
-    scale_x_continuous(labels = NULL) +
-    scale_y_continuous(labels = NULL)
+to_fit <- create_fit(model, to_fit, k = 10)
+p <- create_plot(to_fit)
+ggsave("../img/gbm_fig09.jpg", p, height = 6, width = 16, dpi = 400)
 
-ggsave("../img/gbm_fig06.jpg", p, height = 6, width = 6, dpi = 400)
+to_fit <- create_fit(model, to_fit, k = 25)
+p <- create_plot(to_fit)
+ggsave("../img/gbm_fig10.jpg", p, height = 6, width = 16, dpi = 400)
 
-to_fit$color <- y_set[xgboost:::predict.xgb.Booster(model, newdata = X_valid, iterationrange = c(4, 5)) + 1]
+to_fit <- create_fit(model, to_fit, k = 50)
+p <- create_plot(to_fit)
+ggsave("../img/gbm_fig11.jpg", p, height = 6, width = 16, dpi = 400)
 
-p <- df %>%
-  ggplot(aes(x, y)) +
-    geom_point(aes(fill = color, color = color), pch = 21, size = 0.5, data = to_fit) +
-    geom_point(aes(fill = color, color = color), pch = 21, size = 2) +
-    scale_fill_identity() +
-    scale_color_identity() +
-    scale_x_continuous(labels = NULL) +
-    scale_y_continuous(labels = NULL)
-
-ggsave("../img/gbm_fig07.jpg", p, height = 6, width = 6, dpi = 400)
-
-to_fit$color <- y_set[xgboost:::predict.xgb.Booster(model, newdata = X_valid, iterationrange = c(8, 9)) + 1]
-
-p <- df %>%
-  ggplot(aes(x, y)) +
-    geom_point(aes(fill = color, color = color), pch = 21, size = 0.5, data = to_fit) +
-    geom_point(aes(fill = color, color = color), pch = 21, size = 2) +
-    scale_fill_identity() +
-    scale_color_identity() +
-    scale_x_continuous(labels = NULL) +
-    scale_y_continuous(labels = NULL)
-
-ggsave("../img/gbm_fig08.jpg", p, height = 6, width = 6, dpi = 400)
-
-
-xgboost:::xgb.plot.tree(model = model)
+to_fit <- create_fit(model, to_fit, k = 100)
+p <- create_plot(to_fit)
+ggsave("../img/gbm_fig12.jpg", p, height = 6, width = 16, dpi = 400)

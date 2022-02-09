@@ -377,6 +377,30 @@ transition: 0.4s;
 a:hover {
 color: #196094;
 }
+.group-row {
+display: flex;
+flex-wrap: wrap;
+align-items: flex-start;
+flex-direction: row;
+height: 250px;
+width: 900px;
+}
+.group-figure {
+text-align: center;
+height: 200px;
+padding-left: 3em;
+padding-right: 3em;
+}
+.group-img {
+width: 200px;
+height: 200px;
+max-height: 200px;
+border: 0;
+vertical-align: bottom;
+}
+.group-caption {
+font-size: 1.5em;
+}
 </style>
 
 
@@ -494,7 +518,10 @@ pre code {
 <p>As in the previous notes, I will use the Amazon product classification task. We will read in the <code>docs</code> and <code>anno</code> tables:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>docs <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;../data/amazon_product_class.csv&quot;</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>anno <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;../data/amazon_product_class_token.csv.gz&quot;</span>)</span></code></pre></div>
-<p>Today, we are going to derive a different type of local model called a gradient boosted trees (GBTs) or gradient boosted machine (GBMs). [Confusingly, the first term is far more common whereas the second abbreviation is more far more popularion.]</p>
+<p>Today, we are going to derive a different type of local model called a gradient boosted trees (GBTs) or gradient boosted machine (GBMs). [Confusingly, the first term is far more common whereas the second abbreviation is more far more popularion.] I have some prose notes below, but in the class we will mostly follow these slides:</p>
+<ul>
+<li><a href="../extra/gbm.pdf">slides</a></li>
+</ul>
 <div id="decision-trees" class="section level2">
 <h2>Decision Trees</h2>
 <p>Before we get to the main model today, we need to understand an intermediate model called a <em>decision tree</em>. There is no good R package for running simple decision trees for multiclass regression, so we will not actually run this model in R. Instead, we will just discuss how the model works.</p>
@@ -516,6 +543,9 @@ pre code {
 <li>building a decision tree with the selected training data to predict updates to the probabilities from this model</li>
 <li>repeat this process many times</li>
 </ul>
+</div>
+<div id="gradient-boosted-trees-in-r" class="section level2">
+<h2>Gradient Boosted Trees in R</h2>
 <p>To run gradient boosted trees, we will use the package <strong>xgboost</strong>, which has a very fast implementation of a learning algorithm. I have wrapped up the package’s functions in a consistent way so that we can call it using the function <code>dsst_gbm_build</code>. The key parameters to set are the number of rounds (or trees) and the learning rate. As always, some trial and error is needed to get a good result. Note that in general, more trees are needed for a smaller learning rate.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">dsst_gbm_build</span>(anno, docs, <span class="at">nrounds =</span> <span class="dv">300</span>, <span class="at">eta =</span> <span class="fl">0.01</span>)</span></code></pre></div>
 <p>Let’s see how well this model predicts the classes in our data (in RStudio, the error rates will print out as you build the model):</p>
