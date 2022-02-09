@@ -128,7 +128,7 @@ And look at the strongest coefficients:
 ```
 
 Now, fit a gradient boosted tree model using the variable "xpos" to create the
-features. Use 1000 trees and set eta equal to 0.2 and use 300 trees.
+features. Set eta equal to 0.2 and use 300 trees.
 
 ```{r, question-12}
 
