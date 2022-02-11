@@ -44,6 +44,11 @@ print.gbmm <- function(x, ...)
   cat("\nk: ", x$ntree, "\n\n")
 }
 
+print.nb <- function(x, ...)
+{
+  cat("\n\n")
+}
+
 print.ldam <- function(x, ...)
 {
   cat("\nntopics: ", max(x$docs$topic), "\n\n")
@@ -357,6 +362,171 @@ dsst_gbm_build <- function(
 
   output
 }
+
+dsst_metrics <- function(
+  anno, docs,
+  doc_var = "doc_id",
+  token_var = "lemma",
+  train_var = "train_id",
+  label_var = "label",
+  train_only = TRUE
+)
+{
+  .assert(doc_var %in% names(docs),
+          sprintf("doc_var '%s' not found in docs", doc_var))
+  .assert(train_var %in% names(docs),
+          sprintf("train_var '%s' not found in docs", train_var))
+  .assert(label_var %in% names(docs),
+          sprintf("label_var '%s' not found in docs", label_var))
+  .assert(doc_var %in% names(anno),
+          sprintf("doc_var '%s' not found in anno", doc_var))
+  .assert(token_var %in% names(anno),
+          sprintf("token_var '%s' not found in docs", token_var))
+
+  # create copies with the correct names (this is messy, but less error prone)
+  docs <- docs[,match(c(doc_var, train_var, label_var), names(docs))]
+  names(docs) <- c("doc_id", "train_id", "label")
+  anno <- anno[,match(c(doc_var, token_var), names(anno))]
+  names(anno) <- c("doc_id", "token")
+
+  if (train_only)
+  {
+    docs <- filter(docs, train_id == "train")
+  }
+
+  counts <- anno %>%
+    inner_join(docs, by = "doc_id") %>%
+    group_by(token, label) %>%
+    summarise(o11 = n()) %>%
+    group_by(token) %>%
+    mutate(o12 = sum(o11) - o11) %>%
+    group_by(label) %>%
+    mutate(o21 = sum(o11) - o11) %>%
+    ungroup() %>%
+    mutate(o22 = sum(o11) - o11 - o12 - o21)
+
+  N <- counts$o11 + counts$o12 + counts$o21 + counts$o22
+  e11 <- (counts$o11 + counts$o12) * ((counts$o11 + counts$o21) / N)
+  e12 <- (counts$o11 + counts$o12) * ((counts$o12 + counts$o22) / N)
+  e21 <- (counts$o21 + counts$o22) * ((counts$o11 + counts$o21) / N)
+  e22 <- (counts$o21 + counts$o22) * ((counts$o12 + counts$o22) / N)
+
+  counts$gscore <- 2 * (
+    counts$o11 * log(counts$o11 / e11) +
+    counts$o12 * log(counts$o12 / e12) +
+    counts$o21 * log(counts$o21 / e21) +
+    counts$o22 * log(counts$o22 / e22)
+  )
+
+  counts$chi2 <- (
+    (counts$o11 - e11)^2 / e11 + (counts$o12 - e12)^2 / e12 +
+    (counts$o21 - e21)^2 / e21 + (counts$o22 - e22)^2 / e22
+  )
+
+  counts$pval <- pchisq(counts$chi2, df = 1, lower.tail = FALSE)
+
+  counts$count_word <- counts$o11 + counts$o12
+  counts$expected <- e11
+  counts <- select(counts, label, token, count = o11, expected, count_word, gscore, chi2)
+  counts <- arrange(counts, label, desc(gscore))
+  counts <- group_by(counts, label) %>% group_split() %>% as.list()
+  counts
+}
+
+dsst_nb_build <- function(
+  anno, docs,
+  min_df = 0.001,
+  max_df = 1.0,
+  max_features = 10000,
+  doc_var = "doc_id",
+  token_var = "lemma",
+  train_var = "train_id",
+  label_var = "label",
+  alpha = 0.9,
+  nfolds = 3
+)
+{
+
+  .assert(doc_var %in% names(docs),
+          sprintf("doc_var '%s' not found in docs", doc_var))
+  .assert(train_var %in% names(docs),
+          sprintf("train_var '%s' not found in docs", train_var))
+  .assert(label_var %in% names(docs),
+          sprintf("label_var '%s' not found in docs", label_var))
+  .assert(doc_var %in% names(anno),
+          sprintf("doc_var '%s' not found in anno", doc_var))
+  .assert(token_var %in% names(anno),
+          sprintf("token_var '%s' not found in docs", token_var))
+
+  # create copies with the correct names (this is messy, but less error prone)
+  docs2 <- docs[,match(c(doc_var, train_var, label_var), names(docs))]
+  names(docs2) <- c("doc_id", "train_id", "label")
+  anno <- anno[,match(c(doc_var, token_var), names(anno))]
+  names(anno) <- c("doc_id", "token")
+
+  # create vocabulary
+  vocab <- anno %>%
+    filter(!is.na(token)) %>%
+    inner_join(filter(docs2, train_id == "train"), by = "doc_id") %>%
+    mutate(n_docs = length(unique(doc_id))) %>%
+    group_by(token) %>%
+    mutate(n_distinct = length(unique(doc_id))) %>%
+    summarise(n = n(), df = first(n_distinct) / first(n_docs)) %>%
+    arrange(desc(n))
+
+  vocab <- vocab %>%
+    slice_head(n = max_features) %>%
+    filter(df <= max_df) %>%
+    filter(df >= min_df)
+
+  # create Naive Bayes estimator
+  nb <- expand_grid(token = vocab$token, label = unique(docs2$label))
+
+  lprobs <- docs2 %>%
+    filter(train_id == "train") %>%
+    mutate(n = n()) %>%
+    group_by(label) %>%
+    summarise(log_prob = log(n()) - log(first(n)))
+
+  tprobs <- anno %>%
+    distinct() %>%
+    mutate(ndocs = n_distinct(doc_id)) %>%
+    left_join(filter(docs2, train_id == "train"), by = "doc_id") %>%
+    group_by(token, label) %>%
+    summarise(n = n(), ndocs = first(ndocs)) %>%
+    ungroup() %>%
+    right_join(nb, by = c("token", "label")) %>%
+    mutate(n = if_else(is.na(n), 1, n + 1)) %>%
+    mutate(ndocs = max(ndocs, na.rm = TRUE)) %>%
+    mutate(log_prob = log(n) - log(ndocs))
+
+  # fit the naive bayes model on the documents
+  pred <- anno %>%
+    distinct() %>%
+    inner_join(tprobs, by = "token") %>%
+    group_by(doc_id, label) %>%
+    summarise(prob = sum(log_prob)) %>%
+    inner_join(lprobs, by = "label") %>%
+    mutate(prob = prob + log_prob) %>%
+    select(-log_prob) %>%
+    rename(pred_label = label) %>%
+    arrange(desc(prob)) %>%
+    mutate(diffs = prob - max(prob)) %>%
+    mutate(pred_value = 1 / sum(exp(diffs))) %>%
+    slice_head(n = 1) %>%
+    inner_join(docs2, by = "doc_id") %>%
+    rename(real_label = label, pred_index = train_id)
+
+  docs <- left_join(docs, pred, by = "doc_id")
+
+  # create the output and return the values
+  output <- structure(list(
+    docs = ungroup(docs)
+  ), class = c('nb'))
+
+  output
+}
+
 
 #############################################################################
 # functions to evaluate performance of the model; these should work on all

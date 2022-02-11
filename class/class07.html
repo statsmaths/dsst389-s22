@@ -11,7 +11,7 @@
 
 
 
-<title>07. Exploratory Data Analysis I</title>
+<title>07. Naïve Bayes</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -236,6 +236,100 @@ window.buildTabsets = function(tocID) {
     </style>
 
 
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  { color: #cccccc; background-color: #303030; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ffcfaf; } /* Alert */
+code span.an { color: #7f9f7f; font-weight: bold; } /* Annotation */
+code span.at { } /* Attribute */
+code span.bn { color: #dca3a3; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #f0dfaf; } /* ControlFlow */
+code span.ch { color: #dca3a3; } /* Char */
+code span.cn { color: #dca3a3; font-weight: bold; } /* Constant */
+code span.co { color: #7f9f7f; } /* Comment */
+code span.cv { color: #7f9f7f; font-weight: bold; } /* CommentVar */
+code span.do { color: #7f9f7f; } /* Documentation */
+code span.dt { color: #dfdfbf; } /* DataType */
+code span.dv { color: #dcdccc; } /* DecVal */
+code span.er { color: #c3bf9f; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #c0bed1; } /* Float */
+code span.fu { color: #efef8f; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #7f9f7f; font-weight: bold; } /* Information */
+code span.kw { color: #f0dfaf; } /* Keyword */
+code span.op { color: #f0efd0; } /* Operator */
+code span.ot { color: #efef8f; } /* Other */
+code span.pp { color: #ffcfaf; font-weight: bold; } /* Preprocessor */
+code span.sc { color: #dca3a3; } /* SpecialChar */
+code span.ss { color: #cc9393; } /* SpecialString */
+code span.st { color: #cc9393; } /* String */
+code span.va { } /* Variable */
+code span.vs { color: #cc9393; } /* VerbatimString */
+code span.wa { color: #7f9f7f; font-weight: bold; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 
 
 
@@ -282,6 +376,30 @@ transition: 0.4s;
 }
 a:hover {
 color: #196094;
+}
+.group-row {
+display: flex;
+flex-wrap: wrap;
+align-items: flex-start;
+flex-direction: row;
+height: 250px;
+width: 900px;
+}
+.group-figure {
+text-align: center;
+height: 200px;
+padding-left: 3em;
+padding-right: 3em;
+}
+.group-img {
+width: 200px;
+height: 200px;
+max-height: 200px;
+border: 0;
+vertical-align: bottom;
+}
+.group-caption {
+font-size: 1.5em;
 }
 </style>
 
@@ -390,12 +508,102 @@ pre code {
 
 
 
-<h1 class="title toc-ignore">07. Exploratory Data Analysis I</h1>
+<h1 class="title toc-ignore">07. Naïve Bayes</h1>
 
 </div>
 
 
-
+<div id="load-the-data" class="section level1">
+<h1>Load the Data</h1>
+<p>As in the previous notes, I will use the Amazon product classification task. We will read in the <code>docs</code> and <code>anno</code> tables:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>docs <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;../data/amazon_product_class.csv&quot;</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>anno <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;../data/amazon_product_class_token.csv.gz&quot;</span>)</span></code></pre></div>
+<p>Today, we are going to derive a new metric for seeing how strongly a term is associated with a category as well as a related predictive algorithm called Naïve Bayes:</p>
+<ul>
+<li><a href="../extra/naive_bayes.pdf">slides</a></li>
+</ul>
+<div id="g-score" class="section level2">
+<h2>G-Score</h2>
+<p>Here is a function that computes the G-scores for a set of terms related to each label in the data.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dsst_metrics</span>(anno, docs)</span></code></pre></div>
+<pre><code>## [[1]]
+## # A tibble: 21,262 × 7
+##    label token  count expected count_word gscore  chi2
+##    &lt;chr&gt; &lt;chr&gt;  &lt;int&gt;    &lt;dbl&gt;      &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt;
+##  1 book  book    3789    1566.       3934  5909. 5266.
+##  2 book  read    1724     746.       1873  2292. 2138.
+##  3 book  film      35     971.       2439  2142. 1502.
+##  4 book  movie     87     926.       2327  1695. 1266.
+##  5 book  author   582     240.        602   918.  813.
+##  6 book  taste     31     398.       1000   765.  563.
+##  7 book  flavor    13     319.        801   691.  488.
+##  8 book  reader   355     143.        359   614.  523.
+##  9 book  write    571     283.        710   491.  489.
+## 10 book  tea       10     219.        550   467.  331.
+## # … with 21,252 more rows
+## 
+## [[2]]
+## # A tibble: 24,402 × 7
+##    label token  count expected count_word gscore  chi2
+##    &lt;chr&gt; &lt;chr&gt;  &lt;int&gt;    &lt;dbl&gt;      &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt;
+##  1 film  film    2404     996.       2439  3985. 3373.
+##  2 film  movie   2235     950.       2327  3332. 2943.
+##  3 film  book     139    1607.       3934  3040. 2276.
+##  4 film  read      98     765.       1873  1272.  985.
+##  5 film  -PRON- 21305   25088.      61435  1051. 1033.
+##  6 film  taste     20     408.       1000   869.  625.
+##  7 film  flavor     7     327.        801   766.  530.
+##  8 film  watch    649     303.        742   701.  668.
+##  9 film  dvd      392     162.        397   654.  551.
+## 10 film  tea        2     225.        550   553.  373.
+## # … with 24,392 more rows
+## 
+## [[3]]
+## # A tibble: 9,661 × 7
+##    label token   count expected count_word gscore  chi2
+##    &lt;chr&gt; &lt;chr&gt;   &lt;int&gt;    &lt;dbl&gt;      &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt;
+##  1 food  taste     949    194.        1000  2739. 3659.
+##  2 food  flavor    781    155.         801  2389. 3136.
+##  3 food  tea       538    106.         550  1658. 2170.
+##  4 food  book        6    762.        3934  1624.  934.
+##  5 food  product   523    112.         580  1370. 1864.
+##  6 food  coffee    448     90.0        465  1334. 1766.
+##  7 food  these     880    315.        1629   967. 1256.
+##  8 food  movie       5    451.        2327   946.  548.
+##  9 food  eat       389     88.7        458   920. 1262.
+## 10 food  use       760    263.        1359   890. 1165.
+## # … with 9,651 more rows</code></pre>
+<p>By default a table is given for each category. If you want to copy these two another program, you’ll need to run something like this and then copy to the clipboard:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dsst_metrics</span>(anno, docs) <span class="sc">%&gt;%</span> <span class="fu">bind_rows</span>() <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(label) <span class="sc">%&gt;%</span> <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">10</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 30 × 7
+## # Groups:   label [3]
+##    label token  count expected count_word gscore  chi2
+##    &lt;chr&gt; &lt;chr&gt;  &lt;int&gt;    &lt;dbl&gt;      &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt;
+##  1 book  book    3789    1566.       3934  5909. 5266.
+##  2 book  read    1724     746.       1873  2292. 2138.
+##  3 book  film      35     971.       2439  2142. 1502.
+##  4 book  movie     87     926.       2327  1695. 1266.
+##  5 book  author   582     240.        602   918.  813.
+##  6 book  taste     31     398.       1000   765.  563.
+##  7 book  flavor    13     319.        801   691.  488.
+##  8 book  reader   355     143.        359   614.  523.
+##  9 book  write    571     283.        710   491.  489.
+## 10 book  tea       10     219.        550   467.  331.
+## # … with 20 more rows</code></pre>
+</div>
+<div id="naïve-bayes" class="section level2">
+<h2>Naïve Bayes</h2>
+<p>To run the Naïve Bayes estimator, we use the following function:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">dsst_nb_build</span>(anno, docs)</span></code></pre></div>
+<p>It performs relatively well here, though not quite as good as the other models:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dsst_erate</span>(model)</span></code></pre></div>
+<pre><code>## # A tibble: 1 × 2
+##    train valid
+##    &lt;dbl&gt; &lt;dbl&gt;
+## 1 0.0843 0.113</code></pre>
+<p>Note that playing around with the parts of speech or other filters can have a larger positive effect compared to other models, so you may need to make some tweaks to get the best results.</p>
+</div>
+</div>
 
 
 
