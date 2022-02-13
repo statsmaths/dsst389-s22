@@ -28,11 +28,41 @@ your solutions with all the output from this code.
 ## Reading the Data
 
 ```{r, message = FALSE}
-
+docs <- read_csv("../data/newsgroups.csv.bz2")
+anno <- read_csv("../data/newsgroups_token.csv.bz2")
 ```
 
 ## Questions
 
 ```{r, question-01}
+dsst_kmeans(anno, docs, doc_var = "label")
+```
 
+```{r, question-01}
+model <- dsst_hclust(anno, docs, doc_var = "label")
+```
+
+```{r, question-01}
+dsst_pca(anno, docs, doc_var = "label") %>% dsst_plot_dred()
+```
+
+```{r, question-01}
+dsst_umap(anno, docs, doc_var = "label") %>% dsst_plot_dred()
+```
+
+```{r, question-01}
+dsst_pca(anno) %>%
+  left_join(select(docs, -text), by = "doc_id") %>%
+  mutate(subject = stringi::stri_extract(label, regex = "[a-z]+\\.")) %>%
+  ggplot(aes(v1, v2)) +
+    geom_point(aes(color = subject))
+```
+
+```{r, question-01}
+dsst_umap(anno) %>%
+  left_join(select(docs, -text), by = "doc_id") %>%
+  mutate(subject = stringi::stri_extract(label, regex = "[a-z]+\\.")) %>%
+  ggplot(aes(v1, v2)) +
+    geom_point(aes(color = subject), show.legend = FALSE) +
+    facet_wrap(~subject)
 ```

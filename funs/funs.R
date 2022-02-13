@@ -926,7 +926,7 @@ dsst_angle_dist <- function(
 
   if (!is.null(docs))
   {
-    anno <- inner_join(anno, select(docs, -text), by = "doc_id")
+    anno <- inner_join(anno, select(docs, -text), by = "doc_id", suffix = c("", "_new"))
   }
 
   .assert(doc_var %in% names(anno),
@@ -974,7 +974,6 @@ dsst_angle_dist <- function(
   res
 }
 
-
 dsst_kmeans <- function(
   anno,
   docs = NULL,
@@ -992,7 +991,7 @@ dsst_kmeans <- function(
 {
   if (!is.null(docs))
   {
-    anno <- inner_join(anno, select(docs, -text), by = "doc_id")
+    anno <- inner_join(anno, select(docs, -text), by = "doc_id", suffix = c("", "_new"))
   }
 
   output_type <- match.arg(output_type)
@@ -1017,6 +1016,82 @@ dsst_kmeans <- function(
   if (output_type == "vector")
   {
     names(df)[1] <- "document"
+    df <- df %>%
+      group_by(cluster) %>%
+      summarize(docs = paste(document, collapse = "; "))
+    df <- df$docs
+  }
+  return(df)
+}
+
+dsst_hclust <- function(
+  anno,
+  docs = NULL,
+  min_df = 0.1,
+  max_df = 0.9,
+  max_features = 10000,
+  doc_var = "doc_id",
+  token_var = "lemma",
+  seed = 1
+)
+{
+
+  if (!is.null(docs))
+  {
+    anno <- inner_join(anno, select(docs, -text), by = "doc_id", suffix = c("", "_new"))
+  }
+
+  .assert(doc_var %in% names(anno),
+          sprintf("doc_var '%s' not found in anno", doc_var))
+  .assert(token_var %in% names(anno),
+          sprintf("token_var '%s' not found in anno", token_var))
+
+  x <- cleanNLP::cnlp_utils_tfidf(
+    anno,
+    min_df = min_df,
+    max_df = max_df,
+    max_features = max_features,
+    doc_var = doc_var,
+    token_var = token_var
+  )
+
+  x <- as.matrix(x)
+  sim <- x/sqrt(rowSums(x * x))
+  sim <- sim %*% t(sim)
+
+  eps <- 0.001
+  sim[sim <= -1 + eps] <- -1 + eps
+  sim[sim >= 1 - eps] <- 1 - eps
+  dists <- acos(sim)/pi
+  dists <- dists[upper.tri(dists)]
+  attr(dists, "Size") <- nrow(sim)
+  attr(dists, "Labels") <- rownames(sim)
+  attr(dists, "Diag") <- FALSE
+  attr(dists, "method") <- "cosine"
+  attr(dists, "class") <- "dist"
+
+  out <- hclust(dists)
+  out
+}
+
+dsst_hclust_plot <- function(model)
+{
+  plot(model)
+}
+
+dsst_hclust_cut <- function(
+  model, nclust = NULL, height = NULL, output_type = c("vector", "df")
+)
+{
+  output_type <- match.arg(output_type)
+  clust <- cutree(model, k = nclust, h = height)
+  df <- tibble(
+    document = names(clust),
+    cluster = as.numeric(clust)
+  ) %>% arrange(cluster)
+
+  if (output_type == "vector")
+  {
     df <- df %>%
       group_by(cluster) %>%
       summarize(docs = paste(document, collapse = "; "))

@@ -63,6 +63,37 @@ dsst_kmeans(anno, docs, doc_var = "label", n_dims = 2, n_clusters = 5L)
 Notice that these closely compare to the clusters you would see by grouping
 nearby points in the PCA plot from last time.
 
+## Hierarchical Clustering
+
+Another method for clustering analysis is to use a hierarchical approach. We
+start by computing the nearest neighbor to each data point. Then, we combine
+the two points that are closest together into a single cluster. Next, we
+recompute the nearest neighbors using the center of the two combined points
+in place of the individual points. This continues until all of the data are
+in a single cluster.
+
+To run hierarchical clustering, we can use the `dsst_hclust` function:
+
+```{r}
+model <- dsst_hclust(anno, docs, doc_var = "label")
+```
+
+The hierarchy of clusters can be seen by plotting the model:
+
+```{r}
+dsst_hclust_plot(model)
+```
+
+We can create a concrete set of clusters by picking the number of clusters or
+the height of the tree to cut at:
+
+```{r}
+dsst_hclust_cut(model, nclust = 10)
+```
+
+Hierarchical clustering works well for a small number of documents but can
+become difficult to use when working with a larger set of documents.
+
 ## Word Relationships
 
 In the preceding analyses, we have focused on the analysis of the
