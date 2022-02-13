@@ -11,7 +11,7 @@ output:
 Sys.setlocale("LC_TIME", "en_US.UTF-8")
 ```
 
-**Due Date**: 21 February 2022 or 23 February 2022 (see below)
+**Due Date**: 21 February 2022 [for all students]
 
 ## General Instructions
 
@@ -21,14 +21,15 @@ work on the project. I find that students prefer having a consistent
 format for the projects, so I will attempt to keep the format the same
 throughout the semester.
 
-On the due-date, your group is responsible for completing two elements:
+Your group is responsible for completing two elements:
 
 1. Slides presenting your results, also submitted in your Box folder.
 2. A presentation based on your slide show. This should be 10-15 minutes in
 length.
 
-As described on the syllabus, the project will be graded using a rubric, which
-can be found [here](../extra/project_rubric.pdf).
+The slides must be uploaded by the first day of presentations regardless of
+when you present. As described on the syllabus, the project will be graded
+using a rubric, which can be found [here](../extra/project_rubric.pdf).
 
 ## Specific Instructions
 

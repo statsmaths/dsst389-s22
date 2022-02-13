@@ -248,13 +248,16 @@ text-align: justify;
 text-justify: inter-word;
 font-size: 18px;
 }
-h1 { font-size: 38px ; font-family: sans-serif !important; }
-h2 { font-size: 30px ; font-family: sans-serif !important }
-h3 { font-size: 22px ; font-family: sans-serif !important }
+h1 { font-size: 38px ; font-family: sans-serif !important ; font-weight: bold }
+h2 { font-size: 22px ; font-family: sans-serif !important ; font-weight: bold }
+h3 { font-size: 22px ; font-family: sans-serif !important ; font-weight: bold }
 li {
 text-align: justify;
 text-justify: inter-word;
 font-size: 18px;
+}
+.section {
+padding-top: 1.5em;
 }
 .section .sourceCode {
 border-radius: 15px;
@@ -279,6 +282,30 @@ transition: 0.4s;
 }
 a:hover {
 color: #196094;
+}
+.group-row {
+display: flex;
+flex-wrap: wrap;
+align-items: flex-start;
+flex-direction: row;
+height: 250px;
+width: 900px;
+}
+.group-figure {
+text-align: center;
+height: 200px;
+padding-left: 3em;
+padding-right: 3em;
+}
+.group-img {
+width: 200px;
+height: 200px;
+max-height: 200px;
+border: 0;
+vertical-align: bottom;
+}
+.group-caption {
+font-size: 1.5em;
 }
 </style>
 
@@ -392,16 +419,16 @@ pre code {
 </div>
 
 
-<p><strong>Due Date</strong>: 21 March 2022 or 23 March 2022 (see below)</p>
+<p><strong>Due Date</strong>: 21 March 2022</p>
 <div id="general-instructions" class="section level2">
 <h2>General Instructions</h2>
 <p>This page outlines the instructions for the first project. You should have a file <code>project03.Rmd</code> in your RStudio workspace where you can work on the project. I find that students prefer having a consistent format for the projects, so I will attempt to keep the format the same throughout the semester.</p>
-<p>On the due-date, your group is responsible for completing two elements:</p>
+<p>Your group is responsible for completing two elements:</p>
 <ol style="list-style-type: decimal">
 <li>Slides presenting your results, also submitted in your Box folder.</li>
-<li>A presentation based on your slide show. This should be between 10 and 15 minutes in length.</li>
+<li>A presentation based on your slide show. This should be 10-15 minutes in length.</li>
 </ol>
-<p>As described on the syllabus, the project will be graded as either Satisfactory or Unsatisfactory. I will provide additional feedback that you can address in the next project.</p>
+<p>The slides must be uploaded by the first day of presentations regardless of when you present. As described on the syllabus, the project will be graded using a rubric, which can be found <a href="../extra/project_rubric.pdf">here</a>.</p>
 </div>
 <div id="specific-instructions" class="section level2">
 <h2>Specific Instructions</h2>

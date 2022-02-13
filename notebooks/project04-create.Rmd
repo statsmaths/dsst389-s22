@@ -4,19 +4,8 @@ output: html_document
 ---
 
 ```{r, include=FALSE, message=FALSE}
-library(tidyverse)
-library(ggrepel)
-library(smodels)
-library(stringi)
-library(Matrix)
-library(glmnet)
-library(cleanNLP)
-library(magrittr)
-
-theme_set(theme_minimal())
-options(dplyr.summarise.inform = FALSE)
-
-source("wiki.R")
+source("../funs/funs.R")
+source("../funs/funs_custom.R")
 ```
 
 You should use this file to create your dataset, and then use the other file
@@ -24,45 +13,44 @@ to read in your data and run the analysis as with the other projects. This
 will help avoid needing to create the data set each time you are working with
 the project.
 
-Here, grab all of the links from one (or more) starter pages and see how many
-pages there are. Try to aim for somewhere between 100 and 1500 pages.
+Here, select a starter page. I'll fill in my example from the notes:
 
 ```{r, message=TRUE}
-starter_page_name <- c("")
-
-starter_page <- wiki_get_pages(starter_page_name, lang = "en")
-starter_page$links <- stri_replace_all(starter_page$links, "%26", fixed = "&")
-exp_pages <- wiki_expand_pages(starter_page)
-wiki <- wiki_get_pages_text(exp_pages)
-
-wiki <- tapply(wiki$text, wiki$page, paste, collapse = " ")
-wiki <- tibble(doc_id = names(wiki), text = as.character(wiki))
-
-print(nrow(wiki))
+obj <- dsst_wiki_load("List_of_French_philosophers")
 ```
 
-If you need to, after looking at the data, use the following code to remove
-any pages that you do not want in your analysis.
+Now, look at some of the links. Note that you may need to change the code here
+based on your starting page.
 
-```{r, message=FALSE}
-remove_these <- c()
-wiki <- wiki[!(wiki$doc_id %in% remove_these), ]
+```{r, message=TRUE}
+links <- dsst_wiki_get_links(obj, xpath = ".//li//a")
 ```
 
-And then, run the udpipe annotator over your data. It will be a bit slower
+Next, grab all of the pages associated with the links you grabbed. This will
+take a while the first time you run it.
+
+```{r, message=TRUE}
+docs <- dsst_wiki_make_data(links)
+docs
+```
+
+We can then run the udpipe annotator over your data. It will be a bit slower
 and not quite as accurate, as the spaCy annotator, but does not require setting
 up Python on your machine (a real pain for just this one assignment).
 
 ```{r}
+library(cleanNLP)
 cnlp_init_udpipe("english")
-token <- cnlp_annotate(wiki, verbose = 1)$token
+
+docs <- filter(docs, stringi::stri_length(text) > 0)
+anno <- cnlp_annotate(docs)$token
 ```
 
-And finally, save the data set here:
+Finally, we can save our data set here:
 
 ```{r}
-write_csv(wiki, file.path("data", "wiki_project04.csv"))
-write_csv(token, file.path("data", "wiki_project04_token.csv.gz"))
+write_csv(docs, file.path("..", "data_project", "wiki.csv"))
+write_csv(anno, file.path("..", "data_project", "wiki_token.csv.gz"))
 ```
 
 You can then read back into R using the code in `project04.Rmd`. If you don't

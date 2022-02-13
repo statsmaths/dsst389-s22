@@ -18,8 +18,8 @@ For today's notes we will work with one of the data sets from Project 2,
 specifically the reviews of Music CDs.
 
 ```{r, message=FALSE}
-docs <- read_csv("../data/cds.csv.gz")
-anno <- read_csv("../data/cds_token.csv.gz")
+docs <- read_csv("../data/amazon_cds.csv.bz2")
+anno <- read_csv("../data/amazon_cds_token.csv.bz2")
 ```
 
 Today we make a shift towards a different type of analysis. So far we
@@ -165,7 +165,9 @@ points while not being concerned with their specific distances. We can compute
 the embedding with the `dsst_umap` function:
 
 ```{r, warning = FALSE}
-dsst_umap(anno)
+anno %>%
+  filter(upos %in% c("NOUN", "ADJ", "VERB")) %>%
+  dsst_umap()
 ```
 
 As with the principal components, the exact value are unimportant. It is the
@@ -173,7 +175,10 @@ relationship between the documents that counts. For example, we can make a plot
 similar to the previous one:
 
 ```{r, warning = FALSE}
-dsst_umap(anno) %>% dsst_plot_dred()
+anno %>%
+  filter(upos %in% c("NOUN", "ADJ", "VERB")) %>%
+  dsst_umap() %>%
+  dsst_plot_dred()
 ```
 
 Notice that shape of the dimensionality reduction results are noticeably
@@ -192,6 +197,7 @@ To create the data to load, run the following function:
 
 ```{r}
 dsst_pca(anno) %>% dsst_json_drep(docs)
+dsst_pca(anno, docs, doc_var = "label") %>% dsst_json_drep(docs)
 ```
 
 By default, it saves the result as a file named "dim_reduction.json" contained
@@ -214,7 +220,7 @@ Let's see some results. For example, here are the users that are the most
 similar to one another:
 
 ```{r}
-dsst_angle_dist(anno, doc_var = "user_name")
+dsst_angle_dist(anno, docs, doc_var = "label")
 ```
 
 When dimensionality reduction is plotted with fewer than 100 items, it also
@@ -222,14 +228,14 @@ includes labels that help us understand the plot without using the JavaScript
 interface (though the latter is still available):
 
 ```{r, warning = FALSE}
-dsst_pca(anno, doc_var = "user_name") %>% dsst_plot_dred()
+dsst_pca(anno, docs, doc_var = "label") %>% dsst_plot_dred()
 ```
 
 We can, for example, understand the difference structure now between the PCA
 and UMAP embeddings by comparing them here:
 
 ```{r, warning = FALSE}
-dsst_umap(anno, doc_var = "user_name") %>% dsst_plot_dred()
+dsst_umap(anno, docs, doc_var = "label") %>% dsst_plot_dred()
 ```
 
 Notice that we start to see clusters of users in the output. How could these

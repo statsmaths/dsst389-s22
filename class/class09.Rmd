@@ -18,8 +18,8 @@ For today's notes we will work with one of the data sets from Project 2,
 specifically the reviews of Music CDs.
 
 ```{r, message=FALSE}
-docs <- read_csv("../data/cds.csv.gz")
-anno <- read_csv("../data/cds_token.csv.gz")
+docs <- read_csv("../data/amazon_cds.csv.bz2")
+anno <- read_csv("../data/amazon_cds_token.csv.bz2")
 ```
 
 Today, we will continue are study of unsupervised learning by studying a few
@@ -57,7 +57,7 @@ To apply K-means, we will use the `dsst_clusters` function. We need to set the
 number of clusters; it is also possible to change the number PCA dimensions.
 
 ```{r}
-dsst_clusters(anno, doc_var = "user_name", n_dims = 2, n_clusters = 5L)
+dsst_kmeans(anno, docs, doc_var = "label", n_dims = 2, n_clusters = 5L)
 ```
 
 Notice that these closely compare to the clusters you would see by grouping
@@ -83,7 +83,7 @@ As well, we can compute clusters of words:
 ```{r, warning=FALSE}
 anno %>%
   filter(upos %in% c("NOUN")) %>%
-  dsst_clusters(invert = TRUE, n_clusters = 5L, n_dims = 15L)
+  dsst_kmeans(invert = TRUE, n_clusters = 5L, n_dims = 15L)
 ```
 
 Do you see any other interesting patterns here?

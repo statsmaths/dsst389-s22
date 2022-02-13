@@ -8,16 +8,10 @@ output:
 ---
 
 ```{r, include=FALSE}
-library(tidyverse)
-library(ggrepel)
-library(smodels)
-
-theme_set(theme_minimal())
-options(pillar.min_character_chars = 15)
 Sys.setlocale("LC_TIME", "en_US.UTF-8")
 ```
 
-**Due Date**: 11 April 2022 or 13 April 2022 (see below)
+**Due Date**: 11 April 2022
 
 ## General Instructions
 
@@ -27,15 +21,15 @@ work on the project. I find that students prefer having a consistent
 format for the projects, so I will attempt to keep the format the same
 throughout the semester.
 
-On the due-date, your group is responsible for completing two elements:
+Your group is responsible for completing two elements:
 
 1. Slides presenting your results, also submitted in your Box folder.
-2. A presentation based on your slide show. This should be between 10 and 15
-minutes in length.
+2. A presentation based on your slide show. This should be 10-15 minutes in
+length.
 
-As described on the syllabus, the project will be graded as either Satisfactory
-or Unsatisfactory. I will provide additional feedback that you can address in
-the next project.
+The slides must be uploaded by the first day of presentations regardless of
+when you present. As described on the syllabus, the project will be graded
+using a rubric, which can be found [here](../extra/project_rubric.pdf).
 
 ## Specific Instructions
 

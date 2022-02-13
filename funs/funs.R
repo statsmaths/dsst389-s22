@@ -911,6 +911,7 @@ dsst_tfidf <- function(
 
 dsst_angle_dist <- function(
   anno,
+  docs = NULL,
   n_docs = 1,
   type = c("each", "overall"),
   min_df = 0.1,
@@ -922,6 +923,12 @@ dsst_angle_dist <- function(
 )
 {
   type <- match.arg(type)
+
+  if (!is.null(docs))
+  {
+    anno <- inner_join(anno, select(docs, -text), by = "doc_id")
+  }
+
   .assert(doc_var %in% names(anno),
           sprintf("doc_var '%s' not found in anno", doc_var))
   .assert(token_var %in% names(anno),
@@ -968,8 +975,9 @@ dsst_angle_dist <- function(
 }
 
 
-dsst_clusters <- function(
+dsst_kmeans <- function(
   anno,
+  docs = NULL,
   n_dims = 2,
   n_clusters = 5L,
   output_type = c("vector", "df"),
@@ -982,6 +990,11 @@ dsst_clusters <- function(
   seed = 1
 )
 {
+  if (!is.null(docs))
+  {
+    anno <- inner_join(anno, select(docs, -text), by = "doc_id")
+  }
+
   output_type <- match.arg(output_type)
 
   df <- dsst_pca(
@@ -1017,6 +1030,7 @@ dsst_clusters <- function(
 
 dsst_pca <- function(
   anno,
+  docs = NULL,
   n_dims = 2,
   invert = FALSE,
   min_df = 0.1,
@@ -1027,6 +1041,11 @@ dsst_pca <- function(
   seed = 1
 )
 {
+  if (!is.null(docs))
+  {
+    anno <- inner_join(anno, select(docs, -text), by = "doc_id")
+  }
+
   if (!is.na(seed)) { set.seed(seed) }
   .assert(doc_var %in% names(anno),
           sprintf("doc_var '%s' not found in anno", doc_var))
@@ -1068,6 +1087,7 @@ dsst_pca <- function(
 
 dsst_umap <- function(
   anno,
+  docs = NULL,
   type = c("each", "overall"),
   min_df = 0.1,
   max_df = 0.9,
@@ -1077,7 +1097,16 @@ dsst_umap <- function(
   seed = 1
 )
 {
+  if (!is.null(docs))
+  {
+    anno <- inner_join(anno, select(docs, -text), by = "doc_id")
+  }
+
   if (!is.na(seed)) { set.seed(seed) }
+  .assert(doc_var %in% names(anno),
+          sprintf("doc_var '%s' not found in anno", doc_var))
+  .assert(token_var %in% names(anno),
+          sprintf("token_var '%s' not found in anno", token_var))
 
   # produce the features
   x <- cleanNLP::cnlp_utils_tfidf(
@@ -1152,8 +1181,9 @@ dsst_json_drep <- function(
   if (!('color' %in% names(cdata))) { cdata$color <- color }
   cdata$v1 <- (cdata$v1 - min(cdata$v1)) / (max(cdata$v1) - min(cdata$v1))
   cdata$v2 <- (cdata$v2 - min(cdata$v2)) / (max(cdata$v2) - min(cdata$v2))
+  cdata$size <- ifelse(nrow(cdata) > 100, "0.2", "1.0")
 
-  cdata <- nest(cdata, meta = -c(color, text, v1, v2))
+  cdata <- nest(cdata, meta = -c(color, text, v1, v2, size))
   res <- as.character(jsonlite::toJSON(cdata, pretty = TRUE))
   write_lines(res, path)
 }
@@ -1352,7 +1382,7 @@ dsst_wiki_get_links <- function(
   links <- stringi::stri_sub(links, 7L, -1L)
   links <- links[!stringi::stri_detect(links, fixed = "#")]
   links <- unique(links)
-  links
+  tibble(links = links)
 }
 
 dsst_wiki_get_links_table <- function(
@@ -1408,6 +1438,7 @@ dsst_wiki_make_data <- function(
   links, cache_dir = file.path("..", "output", "cache")
 )
 {
+  links <- links$links
   nl <- length(links)
   res <- tibble(doc_id = rep(NA_character_, nl), text = rep(NA_character_, nl))
   for (j in seq_len(nl))
