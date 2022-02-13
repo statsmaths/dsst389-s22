@@ -44,27 +44,27 @@ Look at the clusters and see if they match the plots you made in the previous
 notebook.
 
 ```{r, question-01}
-
+dsst_kmeans(anno, docs, doc_var = "label")
 ```
 
 Now, run hierarchical clustering on the categories. Save the model as an R
 object.
 
 ```{r, question-02}
-
+model <- dsst_hclust(anno, docs, doc_var = "label")
 ```
 
 Plot the hierarchical clustering and notice what additional information it
 gives compared to K-means.
 
 ```{r, question-03}
-
+dsst_hclust_plot(model)
 ```
 
 Cut the tree into 5 clusters and compare to the K-means clusters.
 
 ```{r, question-04}
-
+dsst_hclust_cut(model, nclust = 5)
 ```
 
 ### Words
@@ -73,14 +73,20 @@ Produce a PCA plot of the nouns, using the option invert = TRUE. You will want
 to adjust the parameter `min_df` to be `0.01`.
 
 ```{r, question-05}
-
+anno %>%
+  filter(upos %in% c("NOUN")) %>%
+  dsst_pca(docs, invert = TRUE, min_df = 0.01) %>%
+  dsst_plot_dred()
 ```
 
 Produce a PCA plot of the verbs, using the option invert = TRUE. You will want
 to adjust the parameter `min_df` to be `0.01`.
 
 ```{r, question-06}
-
+anno %>%
+  filter(upos %in% c("VERB")) %>%
+  dsst_pca(docs, invert = TRUE, min_df = 0.01) %>%
+  dsst_plot_dred()
 ```
 
 What interesting patterns do you see in the previous two plots?

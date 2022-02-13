@@ -43,28 +43,28 @@ anno <- read_csv("../data/newsgroups_token.csv.bz2")
 Build an elastic net model to determine the category of the newsgroup messages:
 
 ```{r, question-01}
-
+model <- dsst_enet_build(anno, docs)
 ```
 
 Produce a confusion matrix for the messages. Take note of any commonly confused
 categories:
 
 ```{r, question-02}
-
+dsst_confusion_matrix(model)
 ```
 
 Look at the positive coefficients from the model; perhaps use `lambda_num = 30`.
 Do the terms seem to correspond to the categories in an expected way?
 
 ```{r, question-03}
-
+dsst_coef_positive(model, lambda_num = 30)
 ```
 
 Now, use the G-score metrics to find the terms that are most associated with
 each category. Again, do these seem to match your intuition?
 
 ```{r, question-04}
-
+dsst_metrics(anno, docs)
 ```
 
 ### Unsupervised Learning
@@ -74,21 +74,21 @@ angle distance. Remember to set the document variable to "label". What do you
 make of the pairs?
 
 ```{r, question-05}
-
+dsst_angle_dist(anno, docs, doc_var = "label")
 ```
 
 Plot (in R) the first two principal components of the categories. Try to find
 some of the document pairs in the PCA plot.
 
 ```{r, question-06}
-
+dsst_pca(anno, docs, doc_var = "label") %>% dsst_plot_dred()
 ```
 
 Now, produce a corresponding UMAP plot. Is this easier or more difficult to
 interpret?
 
 ```{r, question-07}
-
+dsst_umap(anno, docs, doc_var = "label") %>% dsst_plot_dred()
 ```
 
 Next, produce the principal components for the messages themselves. Save the
@@ -97,14 +97,14 @@ results as a JSON file and go to the link below to visualise the results.
 - https://statsmaths.github.io/text-embed-explo/build/
 
 ```{r, question-08}
-
+dsst_pca(anno) %>% dsst_json_drep(docs)
 ```
 
 Repeat the last question for the UMAP parameters. Did you find any interesting
 clusters of documents?
 
 ```{r, question-09}
-
+dsst_umap(anno) %>% dsst_json_drep(docs)
 ```
 
 Make sure to not rush through this step; take a couple minutes to pan around
