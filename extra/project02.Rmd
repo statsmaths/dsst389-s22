@@ -11,7 +11,7 @@ output:
 Sys.setlocale("LC_TIME", "en_US.UTF-8")
 ```
 
-**Due Date**: 21 February 2022 [for all students]
+**Due Date**: 23 February 2022 [note the update]
 
 ## General Instructions
 
@@ -24,8 +24,8 @@ throughout the semester.
 Your group is responsible for completing two elements:
 
 1. Slides presenting your results, also submitted in your Box folder.
-2. A presentation based on your slide show. This should be 10-15 minutes in
-length.
+2. A presentation based on your slide show. This should be ~~10-15~~ 8-10
+minutes in length.
 
 The slides must be uploaded by the first day of presentations regardless of
 when you present. As described on the syllabus, the project will be graded
@@ -99,7 +99,7 @@ save the file.
 Each group is working with a different product category. You should be able to
 download your data set from within the `project02.Rmd` file.
 
-For the first day (21 February 2022) we have, in order:
+We will have, in order:
 
 **Group 8**: `pet_supplies`
 
@@ -108,8 +108,6 @@ For the first day (21 February 2022) we have, in order:
 **Group 4**: `movies_tv`
 
 **Group 2**: `grocery`
-
-For the second day (23 February 2022) we have, in order:
 
 **Group 7**: `cds`
 
