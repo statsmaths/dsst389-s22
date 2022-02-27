@@ -45,13 +45,13 @@ grouping variable) are:
 yes there are a lot of problems with this, but still interesting to look at)
 2. author name (100 authors in each dataset)
 3. stars (1-5)
-4. business categories (as in the notes)
+4. business categories
 5. business names
 
 As with the first two projects, you are encouraged to take the data in whatever
 direction you find most interesting. The only thing I require is that you focus
 a non-trivial amount of your work on integrating the unsupervised approaches
-covered in Notebook13 into your analysis. Note that gender has too few
+covered in Notebooks 8 and 9 into your analysis. Note that gender has too few
 categories to use unsupervised on its own and business names likely have too
 many to do supervised learning.
 

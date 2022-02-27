@@ -1228,7 +1228,8 @@ dsst_json_drep <- function(
   docs,
   path = file.path("..", "output", "dim_reduction.json"),
   nchar = 500L,
-  color = "#fe8019"
+  color_var = NULL,
+  title_vars = "doc_id"
 )
 {
   doc_var <- names(object)[1]
@@ -1250,10 +1251,25 @@ dsst_json_drep <- function(
       summarise(text = stringi::stri_paste(text, collapse = "\n\n"))
   }
   cdata$text <- stringi::stri_sub(cdata$text, 1, nchar)
-  cdata <- inner_join(object, cdata, by = c("doc_id" = "doc_id"))
+  cdata <- inner_join(object, cdata, by = c("doc_id" = doc_var))
   cdata <- filter(cdata, !is.na(v1), !is.na(v2))
 
-  if (!('color' %in% names(cdata))) { cdata$color <- color }
+  # figure out the colors
+  if (!is.null(color_var))
+  {
+    value_set <- unique(cdata[[color_var]])
+    color_set <- scales::hue_pal()(length(value_set))
+    index <- match(cdata[[color_var]], value_set)
+    cdata$color <- color_set[index]
+  } else {
+    cdata$color <- "#bdae93"
+  }
+
+  # figure out the title
+  these <- cdata[, which(names(cdata) %in% title_vars)]
+  cdata$doc_id <- apply(these, 1, paste, collapse = "; ")
+
+  # scale values for v1 and v2 and set values for size
   cdata$v1 <- (cdata$v1 - min(cdata$v1)) / (max(cdata$v1) - min(cdata$v1))
   cdata$v2 <- (cdata$v2 - min(cdata$v2)) / (max(cdata$v2) - min(cdata$v2))
   cdata$size <- ifelse(nrow(cdata) > 100, "0.2", "1.0")

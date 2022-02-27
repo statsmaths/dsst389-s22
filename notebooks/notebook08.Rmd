@@ -69,9 +69,8 @@ each category. Again, do these seem to match your intuition?
 
 ### Unsupervised Learning
 
-Let's move on to new material. Find the closest pairs of categories using the
-angle distance. Remember to set the document variable to "label". What do you
-make of the pairs?
+Let's move on to new material. Compute the first two principal components of
+the categories. Remember to set the document variable to "label".
 
 ```{r, question-05}
 
@@ -93,6 +92,7 @@ interpret?
 
 Next, produce the principal components for the messages themselves. Save the
 results as a JSON file and go to the link below to visualise the results.
+Color the points based on the labels.
 
 - https://statsmaths.github.io/text-embed-explo/build/
 

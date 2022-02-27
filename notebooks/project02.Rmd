@@ -11,7 +11,7 @@ source("../funs/funs_custom.R")
 # Load and Download the Data
 
 ```{r, message=FALSE}
-sname <- ""   # put the name of the dataset from the project page here
+sname <- "cds"   # put the name of the dataset from the project page here
 docs <- dsst_project_docs("amazon", sname)
 anno <- dsst_project_anno("amazon", sname)
 ```

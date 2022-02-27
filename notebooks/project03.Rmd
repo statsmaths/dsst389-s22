@@ -12,8 +12,8 @@ source("../funs/funs_custom.R")
 
 ```{r, message=FALSE}
 sname <- ""   # put the name of the dataset from the project page here
-docs <- dsst_project_docs("yelp", sname)
-anno <- dsst_project_anno("yelp", sname)
+docs <- dsst_project_docs("revs", sname)
+anno <- dsst_project_anno("revs", sname)
 ```
 
 # Project Code

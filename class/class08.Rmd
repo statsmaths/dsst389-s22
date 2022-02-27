@@ -91,27 +91,6 @@ The TF-IDF matrix is what was being used to generate nearest neighbours. In the
 next section, we will again use the TF-IDF scores to compute distances, but in
 a slightly different way.
 
-## Distances
-
-One way to understand the structure of our data in the high-dimensional space
-of the TF-IDF matrix is to compute the distance between documents. We could do
-this with typical Euclidean distances. However, as we mentioned with KNN, this
-would by heavily biased based on the number of words in each document and would
-be heavily influence by the most frequent terms.
-
-A better approach is to look at the angle between two documents as projected in
-a high-dimensional space. We can compute angle distances that with the function
-`dsst_angle_dist()`:
-
-```{r}
-dsst_angle_dist(anno)
-```
-
-The default associates each document with its one closest document. We can
-extend this to a larger set of document by selecting a different parameter
-`n`. We will see in a moment how we might learn something from these distances.
-For now, let us move onto a slightly different task.
-
 ## Principal component analysis (PCA)
 
 Now, let's consider one of the most important types of unsupervised learning:
@@ -191,13 +170,14 @@ are known as **embeddings**. The shapes can be interesting to look at but they
 do not immediately tell us much about the space. The key is that we need a new
 way of visualising the output in an interactive way beyond what is possible
 directly in R. Instead, let's save the results of the embedding as a json
-file and visualise it using a tool writen in JavaScript.
+file and visualise it using a tool written in JavaScript.
 
-To create the data to load, run the following function:
+To create the data to load, run the following function (note the two options
+that control the output):
 
 ```{r}
-dsst_pca(anno) %>% dsst_json_drep(docs)
-dsst_pca(anno, docs, doc_var = "label") %>% dsst_json_drep(docs)
+dsst_pca(anno) %>%
+  dsst_json_drep(docs, color_var = "label", title_vars = c("doc_id", "label"))
 ```
 
 By default, it saves the result as a file named "dim_reduction.json" contained
@@ -211,21 +191,14 @@ interactive visualisation for you to explore the dataset in.
 In addition to making an interactive visualisation, another way that we can
 make the results of unsupervised learning more interesting is to change what
 we consider a document. The documents in this example by default are individual
-produce reviews. However, we could collect the tokens across another metadata
+product reviews. However, we could collect the tokens across another metadata
 category. For example, we could consider all of a users reviews to collectively
 be a single "document". To change this, all we need to do is set the value of
 the `doc_id` variable in the respective functions.
 
-Let's see some results. For example, here are the users that are the most
-similar to one another:
-
-```{r}
-dsst_angle_dist(anno, docs, doc_var = "label")
-```
-
-When dimensionality reduction is plotted with fewer than 100 items, it also
-includes labels that help us understand the plot without using the JavaScript
-interface (though the latter is still available):
+Let's see some results. When dimensionality reduction is plotted with fewer
+than 100 items, it also includes labels that help us understand the plot without
+using the JavaScript interface (though the latter is still available):
 
 ```{r, warning = FALSE}
 dsst_pca(anno, docs, doc_var = "label") %>% dsst_plot_dred()

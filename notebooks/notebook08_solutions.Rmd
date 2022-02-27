@@ -69,12 +69,11 @@ dsst_metrics(anno, docs)
 
 ### Unsupervised Learning
 
-Let's move on to new material. Find the closest pairs of categories using the
-angle distance. Remember to set the document variable to "label". What do you
-make of the pairs?
+Let's move on to new material. Compute the first two principal components of
+the categories. Remember to set the document variable to "label".
 
 ```{r, question-05}
-dsst_angle_dist(anno, docs, doc_var = "label")
+dsst_pca(anno, docs, doc_var = "label")
 ```
 
 Plot (in R) the first two principal components of the categories. Try to find
@@ -92,19 +91,20 @@ dsst_umap(anno, docs, doc_var = "label") %>% dsst_plot_dred()
 ```
 
 Next, produce the principal components for the messages themselves. Save the
-results as a JSON file and go to the link below to visualise the results.
+results as a JSON file and go to the link below to visualise the results. Color
+the points based on the labels.
 
 - https://statsmaths.github.io/text-embed-explo/build/
 
 ```{r, question-08}
-dsst_pca(anno) %>% dsst_json_drep(docs)
+dsst_pca(anno) %>% dsst_json_drep(docs, color_var = "label")
 ```
 
 Repeat the last question for the UMAP parameters. Did you find any interesting
 clusters of documents?
 
 ```{r, question-09}
-dsst_umap(anno) %>% dsst_json_drep(docs)
+dsst_umap(anno) %>% dsst_json_drep(docs, color_var = "label")
 ```
 
 Make sure to not rush through this step; take a couple minutes to pan around
