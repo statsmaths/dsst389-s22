@@ -74,6 +74,8 @@ For the first day (21 March 2022) we have, in order:
 
 **Group 3**: `pittsburgh`
 
+**Group 9**: `urbana-champaign`
+
 For the second day (23 March 2022) we have, in order:
 
 **Group 6**: `madison`

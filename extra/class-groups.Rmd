@@ -92,10 +92,6 @@ Project groups will be formed during the first week of the semester.
 
 <div class="group-row">
   <figure class="group-figure">
-    <img src="../icons/eli_lion_blue.svg" class="group-img"/>
-    <figcaption class="group-caption"><b>Eli</b></figcaption>
-  </figure>
-  <figure class="group-figure">
     <img src="../icons/zohaib_falcon_yellow.svg" class="group-img"/>
     <figcaption class="group-caption"><b>Zohaib</b></figcaption>
   </figure>
@@ -136,6 +132,18 @@ Project groups will be formed during the first week of the semester.
 </div>
 
 <hr style="height: 0px; border: none; border-top: 2px solid black;">
+
+**Group 9**:
+
+<div class="group-row">
+  <figure class="group-figure">
+    <img src="../icons/eli_lion_blue.svg" class="group-img"/>
+    <figcaption class="group-caption"><b>Eli</b></figcaption>
+  </figure>
+</div>
+
+<hr style="height: 0px; border: none; border-top: 2px solid black;">
+
 
 # Section 02 (15h00 > 16h15)
 
