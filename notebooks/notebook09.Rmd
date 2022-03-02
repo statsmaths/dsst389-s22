@@ -47,7 +47,7 @@ notebook.
 
 ```
 
-Now, run hierarchical clustering on the categories. Save the model as an R
+Now, run hierarchical clustering on the categories. Store the model as an R
 object.
 
 ```{r, question-02}

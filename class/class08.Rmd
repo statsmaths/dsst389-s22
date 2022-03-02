@@ -12,6 +12,8 @@ source("../funs/funs.R")
 options(dsst.traceit = FALSE)
 ```
 
+- [slides](../extra/dimred.pdf)
+
 ## Load the Data
 
 For today's notes we will work with one of the data sets from Project 2,

@@ -40,7 +40,7 @@ clusters.
 4. Assign each data point to the cluster whose centroids it is closest.
 5. Re-compute the cluster centroids as the average value of all the points in a
 cluster.
-6. Take the new cluster centroids, and repeat the process (computer distances,
+6. Take the new cluster centroids, and repeat the process (compute distances,
 reassign to groups, and recompute the centroids) iteratively until convergence.
 
 The algorithm is not entirely deterministic because of the random starting
@@ -54,7 +54,7 @@ embedding itself. Often you will find that including a few dozen PCA components
 provides a better fit (though it is rarely useful to use the entire TF-IDF).
 
 To apply K-means, we will use the `dsst_clusters` function. We need to set the
-number of clusters; it is also possible to change the number PCA dimensions.
+number of clusters; it is also possible to change the number of PCA dimensions.
 
 ```{r}
 dsst_kmeans(anno, docs, doc_var = "label", n_dims = 2, n_clusters = 5L)
@@ -62,6 +62,27 @@ dsst_kmeans(anno, docs, doc_var = "label", n_dims = 2, n_clusters = 5L)
 
 Notice that these closely compare to the clusters you would see by grouping
 nearby points in the PCA plot from last time.
+
+The kmeans function has an option for returning the results as a data frame:
+
+```{r}
+df <- dsst_kmeans(anno, docs, doc_var = "label", n_dims = 2, n_clusters = 5L,
+                  output_type="df")
+df
+```
+
+This allows us to use the data to build other visualisations:
+
+```{r}
+library(ggrepel)
+
+df %>%
+  mutate(cluster = factor(cluster)) %>%
+  ggplot(aes(v1, v2, color = cluster)) +
+    geom_point() +
+    geom_text_repel(aes(label = label), show.legend = FALSE) +
+    theme_void()
+```
 
 ## Hierarchical Clustering
 
@@ -118,3 +139,26 @@ anno %>%
 ```
 
 Do you see any other interesting patterns here?
+
+Hopefully you are starting to see the possibilites of things that we can do
+with this kind of method. For example, let's cluster the nouns, verbs, and
+adjectives:
+
+```{r, warning=FALSE}
+df <- anno %>%
+  filter(upos %in% c("NOUN", "VERB", "ADJ")) %>%
+  mutate(lemma = stri_paste(lemma, upos, sep = "_")) %>%
+  dsst_kmeans(invert = TRUE, n_clusters = 5L, n_dims = 15L, output_type="df")
+df
+```
+
+And then plot them according to the part of speech:
+
+```{r, warning=FALSE}
+df %>%
+  mutate(upos = stri_extract(doc_id, regex = "[^_][A-Z]+\\Z")) %>%
+  mutate(cluster = factor(cluster)) %>%
+  ggplot(aes(v1, v2, color = upos)) +
+    geom_text(aes(label = doc_id), show.legend = FALSE) +
+    theme_void()
+```
