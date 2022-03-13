@@ -369,6 +369,7 @@ dsst_metrics <- function(
   token_var = "lemma",
   train_var = "train_id",
   label_var = "label",
+  higher_only = FALSE,
   train_only = TRUE
 )
 {
@@ -429,6 +430,12 @@ dsst_metrics <- function(
   counts$expected <- e11
   counts <- select(counts, label, token, count = o11, expected, count_word, gscore, chi2)
   counts <- arrange(counts, label, desc(gscore))
+
+  if (higher_only)
+  {
+    counts <- filter(counts, count > expected)
+  }
+
   counts <- group_by(counts, label) %>% group_split() %>% as.list()
   counts
 }
@@ -1027,6 +1034,8 @@ dsst_kmeans <- function(
 dsst_hclust <- function(
   anno,
   docs = NULL,
+  n_dims = 2,
+  invert = FALSE,
   min_df = 0.1,
   max_df = 0.9,
   max_features = 10000,
@@ -1046,31 +1055,21 @@ dsst_hclust <- function(
   .assert(token_var %in% names(anno),
           sprintf("token_var '%s' not found in anno", token_var))
 
-  x <- cleanNLP::cnlp_utils_tfidf(
-    anno,
+  df <- dsst_pca(
+    anno = anno,
+    n_dims = n_dims,
+    invert = invert,
     min_df = min_df,
     max_df = max_df,
     max_features = max_features,
     doc_var = doc_var,
-    token_var = token_var
+    token_var = token_var,
+    seed = seed
   )
 
-  x <- as.matrix(x)
-  sim <- x/sqrt(rowSums(x * x))
-  sim <- sim %*% t(sim)
-
-  eps <- 0.001
-  sim[sim <= -1 + eps] <- -1 + eps
-  sim[sim >= 1 - eps] <- 1 - eps
-  dists <- acos(sim)/pi
-  dists <- dists[upper.tri(dists)]
-  attr(dists, "Size") <- nrow(sim)
-  attr(dists, "Labels") <- rownames(sim)
-  attr(dists, "Diag") <- FALSE
-  attr(dists, "method") <- "cosine"
-  attr(dists, "class") <- "dist"
-
-  out <- hclust(dists)
+  X <- as.matrix(df[, -1L, drop = FALSE])
+  rownames(X) <- df[[1L]]
+  out <- hclust(dist(X), method = "single")
   out
 }
 
