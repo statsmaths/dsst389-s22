@@ -35,24 +35,20 @@ using a rubric, which can be found [here](../extra/project_rubric.pdf).
 
 For this project, part of the assignment is constructing your data set from
 Wikipeda. This can be done with the code in `project04-create.Rmd`. Following
-the method used in Notebook12, you will start with a small set of pages, and
+the method used in Notebook11, you will start with a small set of pages, and
 create a corpus of pages by following the links from those starting page(s).
 
-The choice of starting pages is completely up to your group. You may, for
+The set of documents you create is completely up to your group. You may, for
 example, choose to start with one option, and then modify it based on the
 initial results. I will come around and make sure everyone is on the right
-track. Good options include large, generic pages such as
-[History](https://en.wikipedia.org/wiki/History),
-[Mathematics](https://en.wikipedia.org/wiki/Mathematics),
-[Mammal](https://en.wikipedia.org/wiki/Mammal), or
-[University](https://en.wikipedia.org/wiki/University). Other good options include
-"list" pages, such as
+track. If you need a suggestion, I would suggest looking at "list" pages, such as
 [Early modern universities](https://en.wikipedia.org/wiki/List_of_early_modern_universities_in_Europe),
 [Sovereign States](https://en.wikipedia.org/wiki/List_of_sovereign_states),
 [U.S. Cities](https://en.wikipedia.org/wiki/List_of_United_States_cities_by_population), or
 [Fantasy Novels](https://en.wikipedia.org/wiki/List_of_fantasy_novels_(A–H)).
-My code even allows you to work with a language other than English, but please
-check with me as I can offer guidance on what other languages are complete
+
+You can even work with a language other than English,
+but please check with me as I can offer guidance on what other languages are complete
 enough (and have good-enough parsers) to work for the project. Ultimately, you
 should aim for somewhere in the range of 100-1500 pages.
 

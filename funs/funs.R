@@ -1437,11 +1437,12 @@ dsst_json_lda <- function(
 }
 
 dsst_wiki_load <- function(
-  page, cache_dir = file.path("..", "output", "cache")
+  page, cache_dir = file.path("..", "output", "cache"), lang = "en"
 )
 {
   # get the page
-  url <- httr::modify_url("https://en.wikipedia.org/w/api.php",
+  url <- httr::modify_url(
+    sprintf("https://%s.wikipedia.org/w/api.php", lang),
     query = list(
       action = "parse",
       format = "json",
@@ -1485,7 +1486,7 @@ dsst_wiki_get_links_table <- function(
   tree <- xml2::read_html(obj$parse$text[[1]])
   tables <- xml2::xml_find_all(tree, xpath = ".//table")
 
-  .assert(length(tables) > table_num,
+  .assert(length(tables) >= table_num,
           sprintf("Asking for table %d of %d", table_num, length(tables)))
 
   this_table <- tables[[table_num]]
@@ -1521,11 +1522,11 @@ dsst_wiki_get_links_table <- function(
   links <- stringi::stri_sub(links, 7L, -1L)
   links <- links[!stringi::stri_detect(links, fixed = "#")]
   links <- unique(links)
-  links
+  tibble(links = links)
 }
 
 dsst_wiki_make_data <- function(
-  links, cache_dir = file.path("..", "output", "cache")
+  links, cache_dir = file.path("..", "output", "cache"), lang = "en"
 )
 {
   links <- links$links
@@ -1533,7 +1534,7 @@ dsst_wiki_make_data <- function(
   res <- tibble(doc_id = rep(NA_character_, nl), text = rep(NA_character_, nl))
   for (j in seq_len(nl))
   {
-    obj_json <- dsst_wiki_load(links[j], cache_dir = cache_dir)
+    obj_json <- dsst_wiki_load(links[j], cache_dir = cache_dir, lang = lang)
     obj_html <- xml2::read_html(obj_json$parse$text[[1]])
 
     refs <- xml2::xml_find_all(obj_html, ".//sup/a")

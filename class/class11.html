@@ -377,6 +377,30 @@ transition: 0.4s;
 a:hover {
 color: #196094;
 }
+.group-row {
+display: flex;
+flex-wrap: wrap;
+align-items: flex-start;
+flex-direction: row;
+height: 250px;
+width: 900px;
+}
+.group-figure {
+text-align: center;
+height: 200px;
+padding-left: 3em;
+padding-right: 3em;
+}
+.group-img {
+width: 200px;
+height: 200px;
+max-height: 200px;
+border: 0;
+vertical-align: bottom;
+}
+.group-caption {
+font-size: 1.5em;
+}
 </style>
 
 
@@ -493,8 +517,8 @@ pre code {
 <h2>Creating a Corpus of Wikipedia Documents</h2>
 <p>For Project 4, unlike the other projects, you will be constructing your own corpus of documents to work with. These documents will come from the text of Wikipedia articles. You will build a corpus of documents by starting with one or more pages that have thematic lists of other pages, and then creating the corpus by selecting the list in question. This project is important in two ways.First, you will see how to build and annotate a corpus from scratch. Secondly, this data is of a different format than others that we have seen. It has a much shorter set of longer documents, more similar to what happens when we selected a different <code>doc_id</code> in the unsupervised learning tasks.</p>
 </div>
-<div id="an-example-list-of-french" class="section level2">
-<h2>An Example: List of French</h2>
+<div id="an-example-list-of-french-philosophers" class="section level2">
+<h2>An Example: List of French Philosophers</h2>
 <p>As usual, I have wrapped up a lot of the complex R code for you in a few functions. Scraping and organising data from Wikipedia is something we do in Math 289 (Intro. Data Science), so if you want to learn more of the details, consider taking that class.</p>
 <p>To start, we need to grab a single Wikipedia page that contains the links that we want to build a corpus from. I will use the page “List_of_French_philosophers”, which has a list of notable French-language philosophers. I will use the function <code>dsst_wiki_load</code> to download this page from the official Wikipedia API:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">dsst_wiki_load</span>(<span class="st">&quot;List_of_French_philosophers&quot;</span>)</span></code></pre></div>
@@ -541,7 +565,7 @@ pre code {
 <p>The difficulty here is that the links are contained inside a table object. On its own, this would be fine for the function <code>dsst_wiki_get_links</code> by just using a different value for the <code>xpath</code> argument (<code>.//table//a</code>). However, in this case we only want to get those links in the first column. This is a bit trickier but fairly common. To fix this issue, I wrote a different function called <code>dsst_wiki_get_links_table</code> that allows you to grab a specific table and a specific column. Here is the function in action:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>links <span class="ot">&lt;-</span> <span class="fu">dsst_wiki_get_links_table</span>(obj, <span class="at">table_num =</span> 1L, <span class="at">column_num =</span> 1L)</span></code></pre></div>
 <p>You will find that the often the function grabs one or two rows you do not want. We will remove these manually:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>links <span class="ot">&lt;-</span> links[<span class="sc">-</span><span class="dv">1</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>links <span class="ot">&lt;-</span> links[<span class="sc">-</span><span class="dv">1</span>,]</span></code></pre></div>
 <p>Once we have the links, we can make the pages from all the links just as before:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>docs <span class="ot">&lt;-</span> <span class="fu">dsst_wiki_make_data</span>(links)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>docs</span></code></pre></div>
@@ -567,6 +591,54 @@ pre code {
 <span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(docs, <span class="fu">file.path</span>(<span class="st">&quot;..&quot;</span>, <span class="st">&quot;data&quot;</span>, <span class="st">&quot;wiki_list_of_sovereign_states.csv&quot;</span>))</span>
 <span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(anno, <span class="fu">file.path</span>(<span class="st">&quot;..&quot;</span>, <span class="st">&quot;data&quot;</span>, <span class="st">&quot;wiki_list_of_sovereign_states_anno.csv.gz&quot;</span>))</span></code></pre></div>
 <p>We will use both of these datasets in several of our upcoming notebooks.</p>
+</div>
+<div id="other-languages" class="section level2">
+<h2>Other Languages</h2>
+<p>You can even use my code to build a dataset from another language’s Wikipedia. For example, here are the list of the countries for the German Wikipedia:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>obj <span class="ot">&lt;-</span> <span class="fu">dsst_wiki_load</span>(<span class="st">&quot;Liste_der_Staaten_der_Erde&quot;</span>, <span class="at">lang =</span> <span class="st">&quot;de&quot;</span>)</span></code></pre></div>
+<p>Now, as before, we can try to get the links from the table:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>links <span class="ot">&lt;-</span> <span class="fu">dsst_wiki_get_links_table</span>(obj, <span class="at">table_num =</span> 1L, <span class="at">column_num =</span> 1L)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>links <span class="ot">&lt;-</span> links[<span class="sc">-</span><span class="dv">1</span>,]</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>links</span></code></pre></div>
+<pre><code>## # A tibble: 206 × 1
+##    links                
+##    &lt;chr&gt;                
+##  1 Abchasien            
+##  2 Afghanistan          
+##  3 %C3%84gypten         
+##  4 Albanien             
+##  5 Algerien             
+##  6 Andorra              
+##  7 Angola               
+##  8 Antigua_und_Barbuda  
+##  9 %C3%84quatorialguinea
+## 10 Argentinien          
+## # … with 196 more rows</code></pre>
+<p>And we have the same data format, just now in German:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>docs <span class="ot">&lt;-</span> <span class="fu">dsst_wiki_make_data</span>(links, <span class="at">lang =</span> <span class="st">&quot;de&quot;</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>docs</span></code></pre></div>
+<pre><code>## # A tibble: 206 × 2
+##    doc_id              text                                                 
+##    &lt;chr&gt;               &lt;chr&gt;                                                
+##  1 Abchasien           &quot;Abchasien ist eine an das Schwarze Meer grenzende R…
+##  2 Afghanistan         &quot;Afghanistan ist ein Binnenstaat an der Schnittstell…
+##  3 Ägypten             &quot;Das Alte Ägypten gilt als eine der frühen Hochkultu…
+##  4 Albanien            &quot;Albanien ist ein Staat in Südosteuropa auf der Balk…
+##  5 Algerien            &quot;Algerien ist ein Staat im Nordwesten Afrikas.\n\nAl…
+##  6 Andorra             &quot;Andorra ist ein in den östlichen Pyrenäen zwischen …
+##  7 Angola              &quot;Angola ist ein Staat im Südwesten Afrikas. National…
+##  8 Antigua und Barbuda &quot;Antigua und Barbuda ist ein unabhängiger Staat inne…
+##  9 Äquatorialguinea    &quot;Die Republik Äquatorialguinea allgemein als Äquator…
+## 10 Argentinien         &quot;Regionale indigene Amtssprachen der Guaraní Wichi T…
+## # … with 196 more rows</code></pre>
+<p>To parse, we need a specific parser for German:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cleanNLP)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cnlp_init_udpipe</span>(<span class="st">&quot;german&quot;</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>anno <span class="ot">&lt;-</span> <span class="fu">cnlp_annotate</span>(docs)<span class="sc">$</span>token</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(docs, <span class="fu">file.path</span>(<span class="st">&quot;..&quot;</span>, <span class="st">&quot;data&quot;</span>, <span class="st">&quot;wiki_list_of_sovereign_states_de.csv&quot;</span>))</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(anno, <span class="fu">file.path</span>(<span class="st">&quot;..&quot;</span>, <span class="st">&quot;data&quot;</span>, <span class="st">&quot;wiki_list_of_sovereign_states_anno_de.csv.gz&quot;</span>))</span></code></pre></div>
+<p>We will look (briefly, my German is terrible) at this data as an example next class.</p>
 </div>
 
 

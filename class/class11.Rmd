@@ -25,7 +25,7 @@ seen. It has a much shorter set of longer documents, more similar to what
 happens when we selected a different `doc_id` in the unsupervised learning
 tasks.
 
-## An Example: List of French
+## An Example: List of French Philosophers
 
 As usual, I have wrapped up a lot of the complex R code for you in a few
 functions. Scraping and organising data from Wikipedia is something we do in
@@ -127,7 +127,7 @@ You will find that the often the function grabs one or two rows you do not
 want. We will remove these manually:
 
 ```{r}
-links <- links[-1]
+links <- links[-1,]
 ```
 
 Once we have the links, we can make the pages from all the links just as before:
@@ -149,3 +149,41 @@ write_csv(anno, file.path("..", "data", "wiki_list_of_sovereign_states_anno.csv.
 ```
 
 We will use both of these datasets in several of our upcoming notebooks.
+
+## Other Languages
+
+You can even use my code to build a dataset from another language's Wikipedia.
+For example, here are the list of the countries for the German Wikipedia:
+
+```{r}
+obj <- dsst_wiki_load("Liste_der_Staaten_der_Erde", lang = "de")
+```
+
+Now, as before, we can try to get the links from the table:
+
+```{r}
+links <- dsst_wiki_get_links_table(obj, table_num = 1L, column_num = 1L)
+links <- links[-1,]
+links
+```
+
+And we have the same data format, just now in German:
+
+```{r}
+docs <- dsst_wiki_make_data(links, lang = "de")
+docs
+```
+
+To parse, we need a specific parser for German:
+
+```{r, eval=FALSE, message=FALSE, warning=FALSE}
+library(cleanNLP)
+cnlp_init_udpipe("german")
+anno <- cnlp_annotate(docs)$token
+
+write_csv(docs, file.path("..", "data", "wiki_list_of_sovereign_states_de.csv"))
+write_csv(anno, file.path("..", "data", "wiki_list_of_sovereign_states_anno_de.csv.gz"))
+```
+
+We will look (briefly, my German is terrible) at this data as an example next
+class.
