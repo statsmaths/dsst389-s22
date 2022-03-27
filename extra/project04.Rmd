@@ -25,7 +25,7 @@ Your group is responsible for completing two elements:
 
 1. Slides presenting your results, also submitted in your Box folder.
 2. A presentation based on your slide show. This should be 10-15 minutes in
-length.
+length (can be slightly shorter if you are a group of one person).
 
 The slides must be uploaded by the first day of presentations regardless of
 when you present. As described on the syllabus, the project will be graded
@@ -59,6 +59,9 @@ and KWiC. Consider including interesting visualizations in addition to tables
 and keep in mind that it is better to give a focused and interesting
 presentation, rather than a boring and encyclopedic one.
 
+**Note**: You may decide for this project that you want to work alone. Please
+let me know if you choose to split into two sub-groups.
+
 ## Groups
 
 Each group is free to determine how they would like to create their data set
@@ -66,23 +69,25 @@ according to the instructions above.
 
 On the first day (11 April 2022) we will have, in order:
 
-**Group 5**
-
-**Group 6**
-
-**Group 8**
-
 **Group 2**
-
-On the second day (13 April 2022) we will have, in order:
-
-**Group 1**
-
-**Group 3**
 
 **Group 4**
 
+**Group 8**
+
+**Group 6**
+
+On the second day (13 April 2022) we will have, in order:
+
+**Group 9**
+
+**Group 3**
+
 **Group 7**
+
+**Group 1**
+
+**Group 5**
 
 ## Notes
 
