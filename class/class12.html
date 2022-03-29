@@ -377,6 +377,30 @@ transition: 0.4s;
 a:hover {
 color: #196094;
 }
+.group-row {
+display: flex;
+flex-wrap: wrap;
+align-items: flex-start;
+flex-direction: row;
+height: 250px;
+width: 900px;
+}
+.group-figure {
+text-align: center;
+height: 200px;
+padding-left: 3em;
+padding-right: 3em;
+}
+.group-img {
+width: 200px;
+height: 200px;
+max-height: 200px;
+border: 0;
+vertical-align: bottom;
+}
+.group-caption {
+font-size: 1.5em;
+}
 </style>
 
 
@@ -516,8 +540,58 @@ pre code {
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> anno <span class="sc">%&gt;%</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(upos <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;NOUN&quot;</span>, <span class="st">&quot;VERBS&quot;</span>, <span class="st">&quot;ADJ&quot;</span>, <span class="st">&quot;ADV&quot;</span>)) <span class="sc">%&gt;%</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dsst_lda_build</span>(<span class="at">num_topics =</span> <span class="dv">16</span>)</span></code></pre></div>
-<p>The results in the object <code>model</code> are structured as data tables. You can use them directly if you want to do some direct EDA on the object. Otherwise, we return again to the idea of building an interactive visualisation using JavaScript. We can write all of the model data as a local JSON file with the <code>dsst_json_lda</code> function:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dsst_json_lda</span>(model, docs)</span></code></pre></div>
+<p>The results in the object <code>model</code> are structured as data tables. You can use them directly if you want to do some direct EDA on the object. For example, here are the documents most associated with each topic:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>model<span class="sc">$</span>docs <span class="sc">%&gt;%</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(topic) <span class="sc">%&gt;%</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(prob)) <span class="sc">%&gt;%</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">countries =</span> <span class="fu">paste</span>(doc_id, <span class="at">collapse =</span> <span class="st">&quot;; &quot;</span>))</span></code></pre></div>
+<pre><code>## # A tibble: 16 × 2
+##    topic countries                                                          
+##    &lt;int&gt; &lt;chr&gt;                                                              
+##  1     1 Guinea; Equatorial Guinea; Sierra Leone; Papua New Guinea; Liberia 
+##  2     2 Canada; Russia; United States; Australia; North Korea              
+##  3     3 Tuvalu; Cook Islands; Saint Kitts and Nevis; Kiribati; Federated S…
+##  4     4 Saudi Arabia; Oman; Egypt; Bahrain; United Arab Emirates           
+##  5     5 Kazakhstan; Kuwait; Niue; Iceland; Qatar                           
+##  6     6 Bolivia; Colombia; Ecuador; El Salvador; Peru                      
+##  7     7 Burundi; Uganda; Central African Republic; Eritrea; South Sudan    
+##  8     8 United Kingdom; Republic of Ireland; Northern Cyprus; New Zealand;…
+##  9     9 Malawi; Benin; Ghana; Ivory Coast; Senegal                         
+## 10    10 Vatican City; Montenegro; Monaco; Andorra; San Marino              
+## 11    11 Zambia; South Africa; Nepal; Botswana; Eswatini                    
+## 12    12 Norway; Kingdom of the Netherlands; Sweden; Finland; Denmark       
+## 13    13 Taiwan; South Korea; Japan; China; Philippines                     
+## 14    14 Czech Republic; Greece; Germany; Hungary; Italy                    
+## 15    15 Lebanon; Syria; Abkhazia; Israel; State of Palestine               
+## 16    16 Spain; Mexico; Dominican Republic; Guatemala; Chile</code></pre>
+<p>Likewise, here are the words most associated with each topic:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>model<span class="sc">$</span>terms <span class="sc">%&gt;%</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(topic) <span class="sc">%&gt;%</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(beta)) <span class="sc">%&gt;%</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">words =</span> <span class="fu">paste</span>(token, <span class="at">collapse =</span> <span class="st">&quot;; &quot;</span>))</span></code></pre></div>
+<pre><code>## # A tibble: 16 × 2
+##    topic words                                            
+##    &lt;int&gt; &lt;chr&gt;                                            
+##  1     1 guinea; coup; african; oil; french               
+##  2     2 federal; russian; worlds; nuclear; percent       
+##  3     3 island; british; sea; species; colony            
+##  4     4 british; oil; arab; egyptian; woman              
+##  5     5 tax; income; company; km; private                
+##  6     6 Portuguese; indigenous; coast; species; José     
+##  7     7 child; ethnic; opposition; african; woman        
+##  8     8 cent; per; Turkish; british; irish               
+##  9     9 french; african; slave; index; music             
+## 10    10 ethnic; parliament; border; italian; french      
+## 11    11 indian; british; species; african; southern      
+## 12    12 parliament; king; municipality; county; immigrant
+## 13    13 chinese; japanese; asian; island; dynasty        
+## 14    14 european; modern; music; german; style           
+## 15    15 russian; ethnic; conflict; israeli; syrian       
+## 16    16 spanish; american; italian; immigrant; indigenous</code></pre>
+<p>Otherwise, we return again to the idea of building an interactive visualisation using JavaScript. We can write all of the model data as a local JSON file with the <code>dsst_json_lda</code> function:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dsst_json_lda</span>(model, docs)</span></code></pre></div>
 <p>The results are, by default, stored in the output directory of your class notes as a file named ““. If we go to the website <a href="https://statsmaths.github.io/topic-explo/build/">Topic Model Visualizer</a> and upload the JSON file that we just produced, it will create an interactive visualisation of the topics for us to explore.</p>
 </div>
 

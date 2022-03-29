@@ -87,9 +87,29 @@ model <- anno %>%
 ```
 
 The results in the object `model` are structured as data tables. You can use
-them directly if you want to do some direct EDA on the object. Otherwise, we
-return again to the idea of building an interactive visualisation using
-JavaScript. We can write all of the model data as a local JSON file with
+them directly if you want to do some direct EDA on the object. For example,
+here are the documents most associated with each topic:
+
+```{r}
+model$docs %>%
+  group_by(topic) %>%
+  arrange(desc(prob)) %>%
+  slice_head(n = 5) %>%
+  summarise(countries = paste(doc_id, collapse = "; "))
+```
+
+Likewise, here are the words most associated with each topic:
+
+```{r}
+model$terms %>%
+  group_by(topic) %>%
+  arrange(desc(beta)) %>%
+  slice_head(n = 5) %>%
+  summarise(words = paste(token, collapse = "; "))
+```
+
+Otherwise, we return again to the idea of building an interactive visualisation
+using JavaScript. We can write all of the model data as a local JSON file with
 the `dsst_json_lda` function:
 
 ```{r}

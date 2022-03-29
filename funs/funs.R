@@ -1326,7 +1326,8 @@ dsst_lda_build <- function(
   # create the output and return the values
   output <- structure(list(
     docs = docs,
-    terms = terms
+    terms = terms,
+    model = lda_model
   ), class = c('ldam'))
 
   return(output)
