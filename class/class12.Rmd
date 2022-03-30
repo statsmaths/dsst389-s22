@@ -12,6 +12,8 @@ source("../funs/funs.R")
 options(dsst.traceit = FALSE)
 ```
 
+- [slides](../extra/lda.pdf)
+
 ## Load Wikipedia Data
 
 We will start by looking at the sovereign states dataset that we
