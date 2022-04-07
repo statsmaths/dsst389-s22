@@ -1,0 +1,356 @@
+---
+title: "13. Other Applications"
+output:
+  html_document:
+    theme: cosmo
+    highlight: zenburn
+    css: "../css/note-style.css"
+---
+
+As you know, this semester we have focused almost entirely on building
+predictive models with textual data. If you doubt how much we've covered and 
+learned, I strongly recommend going back to the first few classes and seeing
+how simple the concepts introduced in those notes (hopefully) seem to you now.
+
+I have mentioned many times, however, that most of the techniques I have been 
+introducing are not specific to textual data and can in fact be applied in a
+wide range of different supervised and unsupervised settings. Today, I am going 
+to show you how this can be done. I won't hide anything away in helper funtions
+and will only call other popular and public R packages. To get started, let's 
+load in all of these packages and set a few options to make the output easier 
+to read in RMarkdown:
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(glmnet)
+library(xgboost)
+library(irlba)
+theme_set(theme_minimal())
+options(dplyr.summarise.inform = FALSE)
+options(readr.show_col_types = FALSE)
+```
+
+These notes are split into three different applications. The first tries to
+predict whether an NBA basketball player has successfully made a shot. The 
+second predicts the type of crime being reported from the city of Chicago. 
+And in the third, we investiage the average income of census regions from across
+the United States.
+
+## Predicted NBA Shots
+
+### The Data
+
+```{r}
+nba <- read_csv("../data/nba_shots.csv")
+```
+
+```{r}
+nba 
+```
+
+```{r}
+set.seed(1)
+
+nba <- nba %>%
+  group_by(fgm) %>%
+  mutate(rnum = runif(n())) %>%
+  mutate(train_id = if_else(rnum < quantile(rnum, 0.6), "train", "valid")) %>%
+  select(-rnum) %>%
+  ungroup()
+```
+
+### Using Logistic Regression
+
+```{r}
+model <- glm(
+  fgm ~ shot_dist + shooter_height + defender_height + factor(period),
+  data = filter(nba, train_id == "train"),
+  family = binomial()
+)
+```
+
+```{r}
+model
+```
+
+```{r}
+pred <- predict(model, newdata = nba, type = "response")
+head(pred)
+```
+
+```{r}
+tapply(nba$fgm != (pred > 0.5), nba$train_id, mean)
+```
+
+
+### Using Penalised Regression
+
+```{r}
+mf <- model.frame(fgm ~ . -1,                   
+                  data = select(nba, -train_id, -player_name)) 
+mt <- attr(mf, "terms")
+y <- model.response(mf)
+X <- model.matrix(mt, mf)
+
+X_train <- X[nba$train_id == "train",]
+y_train <- y[nba$train_id == "train"]
+```
+
+```{r}
+model <- cv.glmnet(X_train, y_train, family = "binomial")
+```
+
+```{r}
+coef(model)
+```
+
+```{r}
+pred <- predict(model, newx = X, type = "response")
+tapply(nba$fgm != (pred > 0.5), nba$train_id, mean)
+```
+
+### Using Gradient Boosted Trees
+
+```{r, message=FALSE}
+mf <- model.frame(fgm ~ . -1,                   
+                  data = select(nba, -train_id, -player_name)) 
+mt <- attr(mf, "terms")
+y <- model.response(mf)
+X <- model.matrix(mt, mf)
+
+X_train <- X[nba$train_id == "train",]
+y_train <- y[nba$train_id == "train"]
+X_valid <- X[nba$train_id == "valid",]
+y_valid <- y[nba$train_id == "valid"]
+```
+
+
+
+```{r, message=FALSE}
+data_train <- xgboost::xgb.DMatrix(data = X_train, label = y_train)
+data_valid <- xgboost::xgb.DMatrix(data = X_valid, label = y_valid)
+watchlist <- list(train=data_train, valid=data_valid)
+```
+
+```{r, message=FALSE}
+model <- xgboost::xgb.train(
+  data = data_train,
+  max_depth = 3,
+  eta = 0.01,
+  nrounds = 200,
+  nthread = 2,
+  objective = "multi:softmax",
+  eval_metric = "merror",
+  watchlist = watchlist,
+  verbose = TRUE,
+  print_every_n = 25,
+  num_class = 2L
+)
+```
+
+```{r}
+pred <- predict(model, newdata = X)
+tapply(nba$fgm != (pred > 0.5), nba$train_id, mean)
+```
+
+### Principal Component Analysis
+
+```{r}
+rot <- as_tibble(prcomp_irlba(t(X), n = 2, scale. = TRUE, center = TRUE)$rotation)
+rot$fgm <- nba$fgm
+```
+
+```{r}
+rot %>%
+  ggplot(aes(PC1, PC2)) +
+    geom_point(aes(color = factor(fgm)), alpha = 0.1, size = 0.5) +
+    scale_color_viridis_d()
+```
+
+## Predicting Crime Types
+
+### The Data
+
+```{r}
+chi <- read_csv("../data/chi_crimes_5.csv")
+chi
+```
+
+
+```{r}
+set.seed(1)
+
+chi <- chi %>%
+  group_by(crime_type) %>%
+  mutate(rnum = runif(n())) %>%
+  mutate(train_id = if_else(rnum < quantile(rnum, 0.6), "train", "valid")) %>%
+  select(-rnum) %>%
+  ungroup()
+```
+
+### Using Penalised Regression
+
+```{r}
+mf <- model.frame( ~ . -1,                   
+                  data = select(chi, -train_id, -crime_type)) 
+mt <- attr(mf, "terms")
+y <- chi$crime_type
+X <- model.matrix(mt, mf)
+
+X_train <- X[nba$train_id == "train",]
+y_train <- y[nba$train_id == "train"]
+```
+
+
+```{r, message=FALSE}
+model <- cv.glmnet(X_train, y_train, family = "multinomial",
+                   nfolds = 3L, alpha = 0.8, lambda.min.ratio = 0.05)
+```
+
+```{r}
+temp <- coef(model)
+beta <- Reduce(cbind, temp)
+colnames(beta) <- names(temp)
+beta <- beta[apply(beta != 0, 1, any),,drop=FALSE]
+beta
+```
+
+```{r}
+pred <- predict(model, newx = X, type = "class")
+head(pred)
+```
+
+```{r}
+tapply(chi$crime_type != pred, chi$train_id, mean)
+```
+
+
+```{r}
+table(chi$crime_type, pred, chi$train_id)
+```
+
+### Using Gradient Boosted Trees
+
+```{r, message=FALSE}
+mf <- model.frame( ~ . -1,                   
+                  data = select(chi, -train_id, -crime_type)) 
+mt <- attr(mf, "terms")
+
+yset <- unique(chi$crime_type)
+y <- match(chi$crime_type, yset) - 1L
+X <- model.matrix(mt, mf)
+
+X_train <- X[chi$train_id == "train",]
+y_train <- y[chi$train_id == "train"]
+X_valid <- X[chi$train_id == "valid",]
+y_valid <- y[chi$train_id == "valid"]
+```
+
+
+```{r, message=FALSE}
+data_train <- xgboost::xgb.DMatrix(data = X_train, label = y_train)
+data_valid <- xgboost::xgb.DMatrix(data = X_valid, label = y_valid)
+watchlist <- list(train=data_train, valid=data_valid)
+```
+
+```{r, message=FALSE}
+model <- xgboost::xgb.train(
+  data = data_train,
+  max_depth = 3,
+  eta = 0.01,
+  nrounds = 200,
+  nthread = 2,
+  objective = "multi:softmax",
+  eval_metric = "merror",
+  watchlist = watchlist,
+  verbose = TRUE,
+  print_every_n = 25,
+  num_class = 5L
+)
+```
+
+```{r}
+pred <- yset[xgboost:::predict.xgb.Booster(model, newdata = X) + 1L]
+tapply(chi$crime_type != pred, chi$train_id, mean)
+```
+
+## Predicting Census Tract Income
+
+### The Data
+
+```{r}
+inc <- read_csv("../data/tract_median_income.csv")
+inc <- select(inc, median_income, lon, lat)
+inc
+```
+
+```{r}
+set.seed(1)
+
+inc <- inc %>%
+  mutate(rnum = runif(n())) %>%
+  mutate(train_id = if_else(rnum < quantile(rnum, 0.6), "train", "valid")) %>%
+  select(-rnum)
+```
+
+### Using Linear Regression
+
+```{r}
+model <- lm(
+  median_income ~ lon + lat,
+  data = filter(inc, train_id == "train")
+)
+```
+
+```{r}
+model
+```
+
+```{r}
+pred <- predict(model, newdata = inc)
+head(pred)
+```
+
+```{r}
+sqrt(tapply((inc$median_income - pred)**2, inc$train_id, mean))
+```
+
+### Using Kmeans as a Feature
+
+```{r}
+X <- as.matrix(select(inc, lon, lat))
+```
+
+
+```{r}
+inc$clust <- kmeans(X, centers = 50L, nstart = 10L)$cluster
+```
+
+```{r}
+ggplot(inc, aes(lon, lat)) +
+  geom_point(aes(color = factor(clust)), show.legend = FALSE) +
+  scale_color_viridis_d()
+```
+
+```{r, warning = FALSE}
+X <- as.matrix(select(inc, lon, lat))
+inc$clust <- kmeans(X, centers = 1000L, nstart = 10L, iter.max = 100L)$cluster
+```
+
+```{r}
+model <- lm(
+  median_income ~ factor(clust),
+  data = filter(inc, train_id == "train")
+)
+```
+
+```{r}
+pred <- predict(model, newdata = inc)
+sqrt(tapply((inc$median_income - pred)**2, inc$train_id, mean))
+```
+
+## Other Methods and Approaches
+
+
+
+

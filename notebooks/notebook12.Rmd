@@ -40,7 +40,7 @@ may want to use on your own Project04 dataset.
 
 ```{r, message = FALSE}
 docs$train_id <- "train"
-docs <- filter(docs, stri_length(text) > 1000)
+#docs <- filter(docs, stri_length(text) > 1000)
 anno <- semi_join(anno, docs, by = "doc_id")
 ```
 
