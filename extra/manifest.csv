@@ -36,3 +36,4 @@ path,date
 "data/wiki_list_of_sovereign_states.csv","2022-03-28"
 "data/wiki_list_of_sovereign_states_anno.csv.gz","2022-03-28"
 "notebooks/notebook12.Rmd","2022-03-30"
+"notebooks/notebook12_solutions.Rmd","2022-04-01"
