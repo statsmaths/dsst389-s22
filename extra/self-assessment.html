@@ -248,13 +248,16 @@ text-align: justify;
 text-justify: inter-word;
 font-size: 18px;
 }
-h1 { font-size: 38px ; font-family: sans-serif !important; }
-h2 { font-size: 30px ; font-family: sans-serif !important }
-h3 { font-size: 22px ; font-family: sans-serif !important }
+h1 { font-size: 38px ; font-family: sans-serif !important ; font-weight: bold }
+h2 { font-size: 22px ; font-family: sans-serif !important ; font-weight: bold }
+h3 { font-size: 22px ; font-family: sans-serif !important ; font-weight: bold }
 li {
 text-align: justify;
 text-justify: inter-word;
 font-size: 18px;
+}
+.section {
+padding-top: 1.5em;
 }
 .section .sourceCode {
 border-radius: 15px;
@@ -279,6 +282,30 @@ transition: 0.4s;
 }
 a:hover {
 color: #196094;
+}
+.group-row {
+display: flex;
+flex-wrap: wrap;
+align-items: flex-start;
+flex-direction: row;
+height: 250px;
+width: 900px;
+}
+.group-figure {
+text-align: center;
+height: 200px;
+padding-left: 3em;
+padding-right: 3em;
+}
+.group-img {
+width: 200px;
+height: 200px;
+max-height: 200px;
+border: 0;
+vertical-align: bottom;
+}
+.group-caption {
+font-size: 1.5em;
 }
 </style>
 
@@ -404,7 +431,7 @@ pre code {
 <li>What aspect(s) of your work this semester was particularly strong?</li>
 <li>Suggest a letter grade for your class engagement that you feel accurately reflects your work. Briefly justify your suggestion.</li>
 </ol>
-<p>You can submit your assessment as either a pdf file or a docx file; the file should be named <code>selfassessment_first_last.docx</code> or <code>selfassessment_first_last.pdf</code> with your first and list names filled in. You may download a <a href="https://raw.githubusercontent.com/statsmaths/dsst389-s21/main/assessment/selfassessment_first_last.docx">template document file</a> to use.</p>
+<p>You can submit your assessment as either a pdf file or a docx file; the file should be named <code>selfassessment_first_last.docx</code> or <code>selfassessment_first_last.pdf</code> with your first and list names filled in. You may download a <a href="https://github.com/statsmaths/dsst389-s22/raw/main/extra/selfassessment_first_last.docx">template document file</a> to use.</p>
 </div>
 <div id="submission" class="section level2">
 <h2>Submission</h2>

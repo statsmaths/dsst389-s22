@@ -30,7 +30,7 @@ You can submit your assessment as either a pdf file or a docx file; the
 file should be named `selfassessment_first_last.docx` or
 `selfassessment_first_last.pdf` with your first and list names filled in.
 You may download a
-[template document file](https://raw.githubusercontent.com/statsmaths/dsst389-s21/main/assessment/selfassessment_first_last.docx)
+[template document file](https://github.com/statsmaths/dsst389-s22/raw/main/extra/selfassessment_first_last.docx)
 to use.
 
 ## Submission
