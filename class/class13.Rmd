@@ -1,5 +1,5 @@
 ---
-title: "13. Other Applications"
+title: "Extensions and Applications"
 output:
   html_document:
     theme: cosmo
@@ -8,16 +8,16 @@ output:
 ---
 
 As you know, this semester we have focused almost entirely on building
-predictive models with textual data. If you doubt how much we've covered and 
+predictive models with textual data. If you doubt how much we've covered and
 learned, I strongly recommend going back to the first few classes and seeing
 how simple the concepts introduced in those notes (hopefully) seem to you now.
 
-I have mentioned many times, however, that most of the techniques I have been 
+I have mentioned many times, however, that most of the techniques I have been
 introducing are not specific to textual data and can in fact be applied in a
-wide range of different supervised and unsupervised settings. Today, I am going 
-to show you how this can be done. I won't hide anything away in helper funtions
-and will only call other popular and public R packages. To get started, let's 
-load in all of these packages and set a few options to make the output easier 
+wide range of different supervised and unsupervised settings. Today, I am going
+to show you how this can be done. I won't hide anything away in helper functions
+and will only call other popular and public R packages. To get started, let's
+load in all of these packages and set a few options to make the output easier
 to read in RMarkdown:
 
 ```{r, message=FALSE, warning=FALSE}
@@ -25,14 +25,17 @@ library(tidyverse)
 library(glmnet)
 library(xgboost)
 library(irlba)
+library(stringi)
+library(FNN)
 theme_set(theme_minimal())
 options(dplyr.summarise.inform = FALSE)
 options(readr.show_col_types = FALSE)
+options(width = 76L)
 ```
 
 These notes are split into three different applications. The first tries to
-predict whether an NBA basketball player has successfully made a shot. The 
-second predicts the type of crime being reported from the city of Chicago. 
+predict whether an NBA basketball player has successfully made a shot. The
+second predicts the type of crime being reported from the city of Chicago.
 And in the third, we investiage the average income of census regions from across
 the United States.
 
@@ -40,13 +43,23 @@ the United States.
 
 ### The Data
 
-```{r}
-nba <- read_csv("../data/nba_shots.csv")
-```
+The first dataset we will consider consists of observations of shots from the
+NBA (I made this a while ago and lost the original documentation, but I think
+it is from the 16-17 season). The variable that we want to predict is called
+`fgm`; it is equal to 0 when the shot was missed and 1 when the shot was made.
 
 ```{r}
-nba 
+nba <- read_csv("../data/nba_shots.csv")
+nba
 ```
+
+Before we start building predicting models, notice that there is no `train_id`
+variable in this dataset. Usually, the task of splitting the data into a
+training and validation (and testing, holdout, tuning, or whatever other data
+partitions you make) are the job of the analyst working with the data. Let's
+see how to add a train id to the data. In the code below, I have used some
+additional code to make sure the distribution of 0s and 1s is exactly the same
+in the training and validation sets:
 
 ```{r}
 set.seed(1)
@@ -59,7 +72,22 @@ nba <- nba %>%
   ungroup()
 ```
 
+The `set.seed` on the first line of the code makes sure that the split into
+training and validation data will be the same everytime we run the code.
+
 ### Using Logistic Regression
+
+The first real model we discussed this semester was logistic regression. We
+never actually ran unpenalised logistic regression in R, though we did talk
+about it in the first few classes. The unpenalised version if useful when you
+have a small number of variables or need to produce p-values, so let's see how
+it works in R.
+
+Logistic regression can be run in R using the `glm` function, which is included
+in the basic installation of R. We specify a *formula* object that describes
+the variable we are trying to predict (`fgm`) and the variables we are using
+to predict it. We will also filter the data to only train on the training data
+and select the family option as `binomial()` to run logistic regression.
 
 ```{r}
 model <- glm(
@@ -69,25 +97,55 @@ model <- glm(
 )
 ```
 
+I used the `factor` function above to tell the regression model to treat the
+period of the game as a categorical, rather than continuous variable. Note that
+the `glm` function assumes that the response variable is coded as 0s and 1s.
+In the next case study we will see how to create this encoding when it is not
+already done in the original data.
+
+Let's look at the output of the model:
+
 ```{r}
 model
 ```
+
+Hopefully you can remember what the coefficients represent and how we could use
+them to build a predictive model. To have R automatically created predicted
+probabilities, we will use the `predict` function. Notice that we want to
+predict on the entire dataset, not just the training data.
 
 ```{r}
 pred <- predict(model, newdata = nba, type = "response")
 head(pred)
 ```
 
+How well does this model perform? We don't have a fancy wrapper function to
+compute an error rate. Instead, here is some base-R code that computes the
+error rate on the training and validation sets:
+
 ```{r}
 tapply(nba$fgm != (pred > 0.5), nba$train_id, mean)
 ```
 
+The dataset has been selected to have a 50/50 split of baskets made and baskets
+missed. Our model is not amazingly predictive, but it is noticably better than
+randomly guessing.
 
 ### Using Penalised Regression
 
+Now, let's see how we could use the penalised logistic regression model on this
+dataset. This is a bit more involved because we first have to create numerical
+matricies from our dataset because the penalised regression function will not
+work directly with a data frame object. This is very common and true for most
+machine learning algorithms in R (and Python for that matter).
+
+We will use a few functions that you probably have never seen to create a
+matrix and vector version of the dataset. We will use all of the variables in
+the data for training the model.
+
 ```{r}
 mf <- model.frame(fgm ~ . -1,                   
-                  data = select(nba, -train_id, -player_name)) 
+                  data = select(nba, -train_id))
 mt <- attr(mf, "terms")
 y <- model.response(mf)
 X <- model.matrix(mt, mf)
@@ -96,24 +154,51 @@ X_train <- X[nba$train_id == "train",]
 y_train <- y[nba$train_id == "train"]
 ```
 
+Now, we can use the `cv.glmnet` with the proper family setting to run penalised
+logistic regression on the data.
+
 ```{r}
 model <- cv.glmnet(X_train, y_train, family = "binomial")
 ```
 
+To get the cross-validation curve, we can use the `plot` function.
+
 ```{r}
-coef(model)
+plot(model)
 ```
+
+To look at the coefficients, we can use the coef function. There are a lot of
+variable because of the player names, so we will look at just the head of the
+coefficients.
+
+```{r}
+head(coef(model), 20)
+```
+
+A slightly modified syntax for the `predict` function produces the predicted
+probabilities:
 
 ```{r}
 pred <- predict(model, newx = X, type = "response")
+```
+
+And the same code from before works to find the error rate:
+
+```{r}
 tapply(nba$fgm != (pred > 0.5), nba$train_id, mean)
 ```
 
+The penalised version with all of the variables works slightly better, but the
+difference is very minor.
+
 ### Using Gradient Boosted Trees
+
+Let's also see how gradient boosted trees work in R without the wrapper
+functions. First, we create a matrix version of the data.
 
 ```{r, message=FALSE}
 mf <- model.frame(fgm ~ . -1,                   
-                  data = select(nba, -train_id, -player_name)) 
+                  data = select(nba, -train_id))
 mt <- attr(mf, "terms")
 y <- model.response(mf)
 X <- model.matrix(mt, mf)
@@ -124,16 +209,19 @@ X_valid <- X[nba$train_id == "valid",]
 y_valid <- y[nba$train_id == "valid"]
 ```
 
-
+Then, we wrap the training and validation data into specifically optimised
+objects for training.
 
 ```{r, message=FALSE}
-data_train <- xgboost::xgb.DMatrix(data = X_train, label = y_train)
-data_valid <- xgboost::xgb.DMatrix(data = X_valid, label = y_valid)
+data_train <- xgb.DMatrix(data = X_train, label = y_train)
+data_valid <- xgb.DMatrix(data = X_valid, label = y_valid)
 watchlist <- list(train=data_train, valid=data_valid)
 ```
 
+Now, we can run the `xgb.train` function from the xgboost package.
+
 ```{r, message=FALSE}
-model <- xgboost::xgb.train(
+model <- xgb.train(
   data = data_train,
   max_depth = 3,
   eta = 0.01,
@@ -148,17 +236,31 @@ model <- xgboost::xgb.train(
 )
 ```
 
+Predicting the values from this model again uses the `predict` function and we
+can test the predictive power in the same way as before.
+
 ```{r}
 pred <- predict(model, newdata = X)
 tapply(nba$fgm != (pred > 0.5), nba$train_id, mean)
 ```
 
+Here we see that the model improves more, though again only slightly. Clearly
+there is some minor benefit to allowing for interactions before terms in the
+model.
+
 ### Principal Component Analysis
+
+As a final method, let's see PCA applied to the dataset. We will work with the
+`X` matrix produced in the previous section. Then, we call the function
+`prcomp_irlba` on the (transpose) of the dataset and convert the results into
+a data frame.
 
 ```{r}
 rot <- as_tibble(prcomp_irlba(t(X), n = 2, scale. = TRUE, center = TRUE)$rotation)
 rot$fgm <- nba$fgm
 ```
+
+Now, let's plot the data:
 
 ```{r}
 rot %>%
@@ -167,15 +269,26 @@ rot %>%
     scale_color_viridis_d()
 ```
 
+You will notice that there are some regions in which field goals are more or
+less likely to be made, but it much harder to make much of this plot than it
+was with the textual data (why?). Note that the strange curve results from
+several of the variables having certain types of dependencies on one another.
+
 ## Predicting Crime Types
 
 ### The Data
+
+As a second dataset, we will look a dataset I created of reported crimes that
+occured in Chicago.  
 
 ```{r}
 chi <- read_csv("../data/chi_crimes_5.csv")
 chi
 ```
 
+Our goal will be to use the details of the crime to determin what type of crime
+had been committed. Before we get started, let's add a training identifier into
+the data.
 
 ```{r}
 set.seed(1)
@@ -188,24 +301,43 @@ chi <- chi %>%
   ungroup()
 ```
 
+The code here is essentially the same as the code for the binary case in the
+first example.
+
 ### Using Penalised Regression
 
+It is possible to run unpenalised multinomial regression, but it is not nearly
+as common nor is it usually very insightful. So let's jump straight to penalised
+regression. The code to create a data matrix in the multivariate prediction
+case is the exact the same as previous example with the variable names changed.
+
 ```{r}
+chi$location <- stri_sub(chi$location, 1L, 17L)
+
 mf <- model.frame( ~ . -1,                   
-                  data = select(chi, -train_id, -crime_type)) 
+                  data = select(chi, -train_id, -crime_type))
 mt <- attr(mf, "terms")
 y <- chi$crime_type
 X <- model.matrix(mt, mf)
 
-X_train <- X[nba$train_id == "train",]
-y_train <- y[nba$train_id == "train"]
+X_train <- X[chi$train_id == "train",]
+y_train <- y[chi$train_id == "train"]
 ```
 
+We can run the same `cv.glmnet` function from before, but need to set the
+family equal to "multinomial". While not required, I will set a few other
+options to make the model run a bit faster (these are options that I set within
+the wrapper function we have been calling all semester).
 
 ```{r, message=FALSE}
 model <- cv.glmnet(X_train, y_train, family = "multinomial",
                    nfolds = 3L, alpha = 0.8, lambda.min.ratio = 0.05)
 ```
+
+We can again use the `coef` function to get the function coefficients, but the
+results from the multinomial model are put together in a rather complex format.
+I will use a few functions to make the results match what we have seen through
+the rest of the semester.
 
 ```{r}
 temp <- coef(model)
@@ -215,25 +347,40 @@ beta <- beta[apply(beta != 0, 1, any),,drop=FALSE]
 beta
 ```
 
+We use the type argument to the predict function to produce predictions based
+on the labels in the original data.
+
 ```{r}
 pred <- predict(model, newx = X, type = "class")
 head(pred)
 ```
 
+This makes finding the error rate of the model fairly easy:
+
 ```{r}
 tapply(chi$crime_type != pred, chi$train_id, mean)
 ```
 
+Given that there are five classes here, this is not a terrible error rate. Let's
+see how to make a confusion matrix:
 
 ```{r}
 table(chi$crime_type, pred, chi$train_id)
 ```
 
+Which crimes seem hardest or easiest to differentiate?
+
 ### Using Gradient Boosted Trees
+
+Running gradient boosted trees requires a bit more work and involves something
+that several R packages for machine learning require: we need to recode the
+labels as integers. Here is the code to do this, which involves creating an
+object `yset` that stores the mapping betwen the codes and the labels in the
+original data.
 
 ```{r, message=FALSE}
 mf <- model.frame( ~ . -1,                   
-                  data = select(chi, -train_id, -crime_type)) 
+                  data = select(chi, -train_id, -crime_type))
 mt <- attr(mf, "terms")
 
 yset <- unique(chi$crime_type)
@@ -246,15 +393,20 @@ X_valid <- X[chi$train_id == "valid",]
 y_valid <- y[chi$train_id == "valid"]
 ```
 
+Now, we can use the same code from before to create the objects needed by
+xgboost:
 
 ```{r, message=FALSE}
-data_train <- xgboost::xgb.DMatrix(data = X_train, label = y_train)
-data_valid <- xgboost::xgb.DMatrix(data = X_valid, label = y_valid)
+data_train <- xgb.DMatrix(data = X_train, label = y_train)
+data_valid <- xgb.DMatrix(data = X_valid, label = y_valid)
 watchlist <- list(train=data_train, valid=data_valid)
 ```
 
+And finally, use `xgb.train` to run the model. Notice that we need to change
+the objective and evaluation metrics to match the multinomial task.
+
 ```{r, message=FALSE}
-model <- xgboost::xgb.train(
+model <- xgb.train(
   data = data_train,
   max_depth = 3,
   eta = 0.01,
@@ -269,20 +421,39 @@ model <- xgboost::xgb.train(
 )
 ```
 
+With the model trained, we will make predictions and transform back into the
+original categories.
+
 ```{r}
-pred <- yset[xgboost:::predict.xgb.Booster(model, newdata = X) + 1L]
+pred <- yset[predict(model, newdata = X) + 1L]
 tapply(chi$crime_type != pred, chi$train_id, mean)
 ```
+
+As in the first case study, the gradient boosted trees are able to make slightly
+better predictions at the expense of having a less-interpretable model.
 
 ## Predicting Census Tract Income
 
 ### The Data
+
+Our last task is a little bit different from anything we have seen this
+semester. We are going to try to use the location of a census tract (a small
+region of the US defined for statistical purposes) to predict the median income
+of households living within the tract. The dataset includes many variables, but
+we will select just three before getting started:
 
 ```{r}
 inc <- read_csv("../data/tract_median_income.csv")
 inc <- select(inc, median_income, lon, lat)
 inc
 ```
+
+What is so different about this dataset? The thing we are trying to predict is
+a continuous number rather than a category. Our goal will be to make predictions
+that are close to this number rather than focusing on making predictions that
+are exactly correct.
+
+We will again need to create a training id for the data:
 
 ```{r}
 set.seed(1)
@@ -293,7 +464,14 @@ inc <- inc %>%
   select(-rnum)
 ```
 
+Here, notice that we do not stratify the training identifiers because there are
+no concrete groups on which to stratify.
+
 ### Using Linear Regression
+
+Since we have a continuous variable to predict, we can use standard linear
+regression with the `lm` function. The syntax is very similar, just a bit
+simplier, than with `glm`.
 
 ```{r}
 model <- lm(
@@ -302,55 +480,119 @@ model <- lm(
 )
 ```
 
+Let's look at the coefficients. Based on these, where do you generally expect
+to find the most affluent census tracts in the US?
+
 ```{r}
 model
 ```
+
+We can get predictions from the model once again with the `predict` function.
+Here, the predictions are dollar amounts:
 
 ```{r}
 pred <- predict(model, newdata = inc)
 head(pred)
 ```
 
+Our typical error rate does not make sense here. Instead, we will measure a
+quantited called the root mean squared error, or RMSE.
+
 ```{r}
 sqrt(tapply((inc$median_income - pred)**2, inc$train_id, mean))
 ```
 
-### Using Kmeans as a Feature
+It's hard to get immediately from an RMSE whether a model is good or not, but
+we can at least compare this value
 
-```{r}
-X <- as.matrix(select(inc, lon, lat))
+### k-Nearest Neighbors
+
+We can run penalised regression and gradient boosted trees on continuous data.
+Doing this is as simply as the above example with a simple change in the model
+family selection. However, for this specific application, let's instead return
+to a model that will be better suited to this example: KNN.
+
+To run k-nearest neighbors, we will again need to make a data matrix.
+
+```{r, message=FALSE}
+mf <- model.frame(median_income ~ lat + lon -1,                   
+                  data = inc)
+mt <- attr(mf, "terms")
+
+y <- model.response(mf)
+X <- model.matrix(mt, mf)
+
+X_train <- X[chi$train_id == "train",]
+y_train <- y[chi$train_id == "train"]
 ```
 
+Now, we can run k-nearest neighbors using the function `knn.reg`. For continuous
+responses, KNN will take the average of the neighbors (rather than the most
+common label). I will start with three neighbors:
 
 ```{r}
-inc$clust <- kmeans(X, centers = 50L, nstart = 10L)$cluster
+pred <- knn.reg(X_train, X, y_train, k = 3)$pred
 ```
+
+Now, we can see how well this method works:
 
 ```{r}
-ggplot(inc, aes(lon, lat)) +
-  geom_point(aes(color = factor(clust)), show.legend = FALSE) +
-  scale_color_viridis_d()
-```
-
-```{r, warning = FALSE}
-X <- as.matrix(select(inc, lon, lat))
-inc$clust <- kmeans(X, centers = 1000L, nstart = 10L, iter.max = 100L)$cluster
-```
-
-```{r}
-model <- lm(
-  median_income ~ factor(clust),
-  data = filter(inc, train_id == "train")
-)
-```
-
-```{r}
-pred <- predict(model, newdata = inc)
 sqrt(tapply((inc$median_income - pred)**2, inc$train_id, mean))
 ```
 
-## Other Methods and Approaches
+It is much more predictive than the previous model. Does that make sense? Why?
 
+## So, why text?
 
+Looking at the above examples have hopefully explained more concretely how to
+apply the techniques from this class to other data types. You might wonder then
+why I thought it made sense to focus on textual data.
 
+Here are six reasons that I like focusing on text analysis for a first pass at
+statistical learning:
 
+1. **Lots of variables** The distinguishing feature of our core set of models
+(penalized regression) is the need to do regression of multi-class
+classification when there are a very large number of variables. This is a very
+common problem in many (most?) domains. For example: genetics, engineering,
+marketing, accounting, finance, operations research, and supply chain
+management. Text is a good example to work with in class because the features
+and results should be familiar to anyone familiar with the English language.
+Most of the other examples require understanding a lot of domain knowledge
+that will not be common to everyone in the class.
+2. **Feature Construction** In order to do text analysis we need to construct
+features; they are not given to us directly. Some can be created directly from
+the data, but most often useful features come from selectively summarising the
+data from the tokens table. Again, this is very common in industry and research
+applications, where the most interesting data points are observed at a
+different frequency or unit of measurement than the response variable. For
+example, think of computing a credit score based on summary statistics selected
+from a person's financial history or determining a patient's prognosis based on
+a history of medical records and lab reports. As with the lots of variables
+point, text is just a useful example of this kind of analysis that does not
+require specialised domain knowledge.
+3. **Text is actually quite common** A surprising amount of data being produced
+and analyzed in industry and research applications contains at least some free
+text fields. Think, for example, of trying to detect indicators of fraud when
+investigating a collection emails, or automatically detecting themes or
+signalling problems by doing text analysis on call center logs. In the age of
+large datasets, the amount of free text used in all kinds of applications will
+likely only grow. Being able to know the specific techniques to work with is
+just another benefit of focusing on textual data.
+4. **False Binary: Supervised/Unsupervised** As we have seen, text datasets
+lend themselves to both modes of analysis simultaneously; this is another
+common feature of real-world applications that is often lost in other textbook
+examples of machine learning applications.
+5. **Returning to the data** We have made a lot of use of techniques such as
+negative examples, maximum probability examples, and KWiC models. These have
+analogs in other spaces too, but are only useful if returning to the original
+data is meaningful. It often is, but often requires specialised domain
+knowledge. Text just requires that we can read.
+
+In addition to the basics of supervised and unsupervised learning, you have
+also gained valuable experience presenting quantitive and qualitative
+information and combining different kinds of evidence to tell a story and make
+and argument. There are valuable skills to have as part of a broad liberal arts
+oriented education.
+
+Hopefully you enjoyed the class and feel like you learned some useful things!

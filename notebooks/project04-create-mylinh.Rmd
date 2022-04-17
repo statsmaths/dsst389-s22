@@ -1,0 +1,173 @@
+---
+title: "Project 04 --- Create Data"
+output: html_document
+---
+
+```{r, include=FALSE, message=FALSE}
+source("../funs/funs.R")
+source("../funs/funs_custom.R")
+```
+
+You should use this file to create your dataset, and then use the other file
+to read in your data and run the analysis as with the other projects. This
+will help avoid needing to create the data set each time you are working with
+the project.
+
+#############
+
+Get releases dates function
+```{r}
+get_disney_data <- function(obj, table_num)
+{
+  tree <- xml2::read_html(obj$parse$text[[1]])
+  tables <- xml2::xml_find_all(tree, xpath = ".//table")
+
+  this_table <- tables[[table_num]]
+  rows <- xml2::xml_find_all(this_table, ".//tr")
+  dates <- xml2::xml_text(xml2::xml_find_first(rows, ".//td"))
+
+  links <- map(rows, function(u) {
+        td <- xml2::xml_find_all(u, ".//td")
+        res <- ifelse(length(td) < 2L, "",
+                      xml2::xml_attr(xml2::xml_find_all(td[[2L]], ".//a"),
+                                     "href"))
+        res
+      })
+
+  links <- tibble(links = unlist(links), dates = lubridate::mdy(dates))
+  links <- filter(links, links != "")
+  links
+}
+```
+
+Here, select a starter page. I'll fill in my example from the notes:
+
+```{r, message=TRUE}
+obj1 <- dsst_wiki_load('List_of_Walt_Disney_Studios_films_(1937–1959)')
+obj2 <- dsst_wiki_load('List_of_Walt_Disney_Studios_films_(1960–1979)')
+obj3 <- dsst_wiki_load('List_of_Walt_Disney_Studios_films_(1980–1989)')
+obj4 <- dsst_wiki_load("List_of_Walt_Disney_Studios_films_(1990–1999)")
+obj5 <- dsst_wiki_load("List_of_Walt_Disney_Studios_films_(2000–2009)")
+obj6 <- dsst_wiki_load("List_of_Walt_Disney_Studios_films_(2010–2019)")
+obj7 <- dsst_wiki_load("List_of_Walt_Disney_Studios_films_(2020–2029)")
+```
+
+```{r}
+dates <- bind_rows(
+  get_disney_data(obj1, table_num = 1L),
+  get_disney_data(obj1, table_num = 2L),
+  get_disney_data(obj1, table_num = 3L),
+  get_disney_data(obj2, table_num = 1L),
+  get_disney_data(obj2, table_num = 2L),
+  get_disney_data(obj3, table_num = 1L),
+  get_disney_data(obj4, table_num = 1L),
+  get_disney_data(obj5, table_num = 1L),
+  get_disney_data(obj6, table_num = 1L),
+  get_disney_data(obj7, table_num = 1L))
+
+  # TA: THIS IS THE ORIGINAL CODE
+  # process the links
+  # dates$links <- dates$links[!is.na(dates$links)]
+  # dates$links <- dates$links[stringi::stri_sub(dates$links, 1L, 6L) == "/wiki/"]
+  # dates$links <- dates$links[stringi::stri_sub(dates$links, 1L, 16L) != "/wiki/Wikipedia:"]
+  # dates$links <- stringi::stri_sub(dates$links, 7L, -1L)
+  # dates$links <-
+  # dates$links <- dates$links[!stringi::stri_detect(dates$links, fixed = "#")]
+  #dates$links <- unique(dates$links)
+  #tibble(dates$links = dates$links)
+
+  # TA: These are like the function filter(), but now using "old"-style R code;
+  # notice that I only use the DATA$VARIABLE format inside the brackets
+  dates <- dates[!is.na(dates$links),]
+  dates <- dates[stringi::stri_sub(dates$links, 1L, 6L) == "/wiki/",]
+  dates <- dates[stringi::stri_sub(dates$links, 1L, 16L) != "/wiki/Wikipedia:",]
+  dates <- dates[!stringi::stri_detect(dates$links, fixed = "#"),]
+  dates <- dates[!is.na(dates$dates),]
+
+  # TA: These are like the function mutate(), but now using "old"-style R code;
+  # here we have to use DATA$VARIABLE on both sides
+  dates$links <- stringi::stri_sub(dates$links, 7L, -1L)
+  dates
+
+```
+
+Now, look at some of the links. Note that you may need to change the code here
+based on your starting page.
+
+```{r, message=TRUE}
+links <- bind_rows(
+  #1937-1959
+  dsst_wiki_get_links_table(obj1, table_num = 1L, column_num = 2L),
+  dsst_wiki_get_links_table(obj1, table_num = 2L, column_num = 2L),
+  dsst_wiki_get_links_table(obj1, table_num = 3L, column_num = 2L),
+  #1960-1979
+  dsst_wiki_get_links_table(obj2, table_num = 1L, column_num = 2L),
+  dsst_wiki_get_links_table(obj2, table_num = 2L, column_num = 2L),
+  #1980-1989
+  dsst_wiki_get_links_table(obj3, table_num = 1L, column_num = 2L),
+  #1990-1999
+  dsst_wiki_get_links_table(obj4, table_num = 1L, column_num = 2L),
+  #2000-2009
+  dsst_wiki_get_links_table(obj5, table_num = 1L, column_num = 2L),
+  #2010-2019
+  dsst_wiki_get_links_table(obj6, table_num = 1L, column_num = 2L),
+  #2020-2029
+  dsst_wiki_get_links_table(obj7, table_num = 1L, column_num = 2L)
+)
+links <- unique(links)
+```
+
+Next, grab all of the pages associated with the links you grabbed. This will
+take a while the first time you run it.
+
+```{r, message=TRUE}
+docs <- dsst_wiki_make_data(links) %>%
+  mutate(doc_id = stri_replace_all(doc_id, '', fixed = '<i>'),
+         doc_id = stri_replace_all(doc_id, '', fixed = '</i>'))
+
+# TA: Let's join your `dates` to links and then line it up with docs, before
+# doing and filtering
+dates_aligned <- links %>%
+  left_join(dates, by = "links")
+docs$date <- dates_aligned$dates
+
+# TA: Now the two data sets are aligned and joined; you can do whatever you want
+docs <- filter(docs, !duplicated(doc_id))
+docs
+#filter out the companies: filter(stri_detect(doc_id, fixed = '<i>'))
+```
+
+```{r}
+docs %>%
+  group_by(doc_id) %>%
+  summarize(n = n()) %>%
+  arrange(desc(n))
+```
+We can then run the udpipe annotator over your data. It will be a bit slower
+and not quite as accurate, as the spaCy annotator, but does not require setting
+up Python on your machine (a real pain for just this one assignment).
+
+```{r}
+library(cleanNLP)
+cnlp_init_udpipe("english")
+
+docs <- filter(docs, stringi::stri_length(text) > 0)
+anno <- cnlp_annotate(docs)$token
+```
+
+Here is a good sanity check, looking at the TF-IDF scores:
+
+```{r}
+dsst_tfidf(anno)
+```
+
+Finally, we can save our data set here:
+
+```{r}
+write_csv(docs, file.path("..", "data_project", "wiki.csv"))
+write_csv(anno, file.path("..", "data_project", "wiki_token.csv.gz"))
+```
+
+You can then read back into R using the code in `project04.Rmd`. If you don't
+find the results very interesting, or need to adjust anything, you can do it
+here
